@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khonsu Tech — OPS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#f0f2f7;--surface:#fff;--surface2:#e8ecf4;--border:#d0d7e8;--accent:#1b2e6b;--accent2:#2d4499;--accent-light:#e8ecf7;--green:#16a34a;--red:#dc2626;--yellow:#d97706;--text:#111827;--muted:#6b7280;--white:#fff;--moon:#c8d0e8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+header{background:linear-gradient(135deg,#1b2e6b,#0f1a40);border-bottom:3px solid var(--moon);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(27,46,107,.18);}
+.logo{font-size:18px;font-weight:800;letter-spacing:1px;color:#fff;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.logo span{color:var(--moon);font-weight:300;letter-spacing:2px;}
+.user-pill{font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);cursor:pointer;}
+.user-pill:hover{background:rgba(255,255,255,.25);}
+nav{display:flex;gap:4px;padding:10px 24px;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:0 1px 4px rgba(27,46,107,.06);}
+.tab{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .15s;}
+.tab:hover{color:var(--accent);background:var(--accent-light);}
+.tab.active{background:var(--accent);color:#fff;}
+.page{display:none;padding:24px;max-width:1100px;margin:0 auto;}
+.page.active{display:block;}
+h2{font-size:20px;font-weight:700;margin-bottom:4px;color:var(--accent);}
+.subtitle{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 6px rgba(27,46,107,.06);margin-bottom:14px;}
+.card h3{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:14px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+input[type=text],input[type=number],input[type=url],select{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;width:100%;transition:border-color .15s;}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(27,46,107,.09);}
+input[readonly]{background:var(--surface2);color:var(--muted);cursor:default;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:var(--accent2);}
+.btn-success{background:var(--green);color:#fff;}.btn-success:hover{opacity:.9;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}.btn-outline:hover{background:var(--surface2);border-color:var(--accent);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-lg{padding:12px 24px;font-size:15px;}
+.cat-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.cat-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .15s;}
+.cat-btn.active,.cat-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sw{position:relative;margin-bottom:14px;}
+.sw input{padding-left:36px;}
+.si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;margin-bottom:18px;}
+.pc{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .15s;position:relative;box-shadow:0 1px 4px rgba(27,46,107,.05);}
+.pc:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(27,46,107,.12);}
+.pc.sel{border-color:var(--accent);background:var(--accent-light);}
+.pc.oos{opacity:.45;cursor:not-allowed;}
+.pc .cl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent2);margin-bottom:5px;}
+.pc .pn{font-size:13px;font-weight:600;line-height:1.3;margin-bottom:3px;}
+.pc .pv{font-size:11px;color:var(--muted);margin-bottom:7px;}
+.pc .pp{font-size:14px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;}
+.sb{position:absolute;top:9px;right:9px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace;}
+.sok{background:#dcfce7;color:#16a34a;}.slow{background:#fef3c7;color:#d97706;}.sout{background:#fee2e2;color:#dc2626;}
+.tbl{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(27,46,107,.06);}
+table{width:100%;border-collapse:collapse;}
+th{padding:11px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff;background:var(--accent);text-align:left;}
+td{padding:10px 14px;font-size:13px;border-top:1px solid var(--border);}
+tr:hover td{background:var(--accent-light);}
+.mono{font-family:'JetBrains Mono',monospace;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.sc{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px;}
+.sc .sl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:6px;}
+.sc .sv{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent);}
+.sv.red{color:var(--red);}.sv.yellow{color:var(--yellow);}.sv.green{color:var(--green);}
+.badge{display:inline-flex;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.by{background:#fef3c7;color:#d97706;}.bg{background:#dcfce7;color:#16a34a;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;border-radius:10px;padding:13px 18px;font-size:13px;font-weight:500;box-shadow:0 8px 32px rgba(27,46,107,.25);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.error{background:var(--red);}.toast.success{background:var(--green);}
+.fbtn{position:fixed;bottom:24px;right:24px;z-index:90;display:none;}
+#lockScreen{position:fixed;inset:0;background:linear-gradient(135deg,#1b2e6b,#0f1a40);z-index:500;display:flex;align-items:center;justify-content:center;}
+.lc{background:rgba(255,255,255,.07);border:1.5px solid rgba(200,208,232,.3);border-radius:20px;padding:40px;text-align:center;max-width:340px;width:100%;}
+.ll{font-size:22px;font-weight:800;color:#fff;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.ll span{color:var(--moon);font-weight:300;}
+.ls{font-size:13px;color:rgba(200,208,232,.7);margin-bottom:32px;}
+.llabel{font-size:12px;color:rgba(200,208,232,.6);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
+.ubtns{display:flex;flex-direction:column;gap:10px;}
+.ubtn{padding:13px;border-radius:10px;border:1.5px solid rgba(200,208,232,.25);background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
+.ubtn:hover{background:rgba(255,255,255,.18);border-color:rgba(200,208,232,.5);}
+.ubtn.admin{border-color:rgba(200,208,232,.5);background:rgba(200,208,232,.1);}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.rrow:last-child{border-bottom:none;}
+.rl{color:var(--muted);font-size:12px;}.rv{font-weight:600;font-size:14px;}
+.rtot{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--accent);border-radius:10px;margin-top:14px;color:#fff;}
+.review-hero{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;padding:20px;margin-bottom:14px;color:#fff;}
+.review-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;margin-right:6px;margin-bottom:6px;}
+.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.review-field{background:var(--bg);border-radius:8px;padding:10px 14px;}
+.review-field .rf-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+.review-field .rf-val{font-size:14px;font-weight:600;color:var(--text);}
+.code-block{background:#f8f9fc;border:1.5px solid var(--border);border-radius:8px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);white-space:pre-wrap;overflow-x:auto;line-height:1.7;position:relative;margin-top:12px;}
+.cpbtn{position:absolute;top:8px;right:8px;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);}
+.stepb{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;margin-bottom:10px;}
+.toggle-obs{cursor:pointer;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:var(--surface2);color:var(--muted);}
+.toggle-obs.avail{background:#dcfce7;color:var(--green);border-color:#bbf7d0;}
+@media(max-width:600px){nav{overflow-x:auto;}.pgrid{grid-template-columns:repeat(2,1fr);}.stats-row{grid-template-columns:repeat(2,1fr);}.g3{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="lockScreen">
+  <div class="lc">
+    <div class="ll">🌕 Khonsu <span>Tech</span></div>
+    <div class="ls">Sales Operations System</div>
+    <div class="llabel">Who's accessing?</div>
+    <div class="ubtns">
+      <button class="ubtn" onclick="login('Sam')">👤 Sam</button>
+      <button class="ubtn" onclick="login('Joyce')">👤 Joyce</button>
+      <button class="ubtn admin" onclick="login('Admin')">🔑 Admin</button>
+    </div>
+  </div>
+</div>
+<header>
+  <div class="logo">🌕 Khonsu <span>Tech</span></div>
+  <div class="user-pill" id="userPill" onclick="logout()">— Switch User</div>
+</header>
+<nav>
+  <button class="tab active" onclick="showPage('sales',event)">🛒 Log Sale</button>
+  <button class="tab" id="tab-inventory" onclick="showPage('inventory',event)">📦 Inventory</button>
+  <button class="tab" id="tab-po" onclick="showPage('po',event)">📋 Purchase Orders</button>
+  <button class="tab" id="tab-ml" onclick="showPage('masterlist',event)">📝 Master List</button>
+  <button class="tab" id="tab-settings" onclick="showPage('settings',event)">🔧 Settings</button>
+  <button class="tab" id="tab-setup" onclick="showPage('setup',event)">⚙️ Setup</button>
+</nav>
+
+<!-- SALES PAGE -->
+<div class="page active" id="page-sales">
+  <!-- S1: PICKER -->
+  <div id="s-picker">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div><h2>Select a Product</h2><p class="subtitle" style="margin:0;">Tap any item to add to current Sales Order.</p></div>
+      <div id="targetBadge" onclick="showS('report')" style="font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;background:#fef3c7;color:#d97706;cursor:pointer;">Target: ₱3,000</div>
+    </div>
+    <!-- Active SO Banner -->
+    <div id="soBanner" style="display:none;background:var(--accent-light);border:1.5px solid var(--accent);border-radius:10px;padding:10px 16px;margin-bottom:12px;display:none;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:18px;">🧾</span>
+        <div>
+          <div style="font-size:12px;color:var(--muted);">Active Sales Order</div>
+          <div style="font-size:15px;font-weight:700;color:var(--accent);font-family:monospace;" id="soLabel">SO-000000</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="clearSO()">✕ New Order</button>
+      </div>
+    </div>
+    <div class="sw"><span class="si">🔍</span><input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()"></div>
+    <div class="cat-filter" id="catFilter"></div>
+    <div class="pgrid" id="productGrid"></div>
+    <div class="fbtn" id="floatBtn">
+      <button class="btn btn-primary" id="floatBtnInner" onclick="pendingItems.length?goToReview():showS('report')" style="border-radius:24px;padding:12px 22px;box-shadow:0 4px 20px rgba(27,46,107,.3);">📋 View Report</button>
+    </div>
+  </div>
+  <!-- S2: DETAIL -->
+  <div id="s-detail" style="display:none;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <button class="btn btn-outline btn-sm" onclick="showS('picker')">← Back</button>
+      <div><h2 style="margin:0;" id="d-title">Sale Details</h2><p style="font-size:13px;color:var(--muted);margin:0;" id="d-sub"></p></div>
+    </div>
+    <div style="background:var(--accent-light);border:1.5px solid var(--accent);border-radius:12px;padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent2);margin-bottom:4px;" id="d-cat"></div>
+        <div style="font-size:20px;font-weight:700;color:var(--accent);" id="d-name"></div>
+        <div style="font-size:13px;color:var(--muted);" id="d-vdisplay"></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:var(--muted);">Price</div>
+        <div style="font-size:26px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;" id="d-srp"></div>
+      </div>
+    </div>
+    <!-- ADDON -->
+    <!-- Freebie display (auto if product has freebie attached) -->
+    <div id="freebieSec" style="display:none;" class="card" style="background:#f0fdf4;border-color:#bbf7d0;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:22px;">🎁</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#15803d;">Freebie Included!</div>
+          <div style="font-size:13px;color:var(--text);" id="freebieItemName">—</div>
+          <div style="font-size:11px;color:var(--muted);">Free with this purchase — no extra charge</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="addonSec" style="display:none;" class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div><div style="font-size:14px;font-weight:600;color:var(--accent);">➕ Add-on</div><div style="font-size:11px;color:var(--muted);">1 accessory per unit</div></div>
+        <button class="btn btn-outline btn-sm" id="addonPickerBtn" onclick="toggleAddonPicker()">+ Add Accessory</button>
+      </div>
+      <div id="addonPicker" style="display:none;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div class="cat-filter" id="addonCatF" style="margin-bottom:10px;"></div>
+        <div class="pgrid" id="addonGrid" style="margin-bottom:0;"></div>
+      </div>
+      <div id="addonList" style="display:none;"><div id="addonItems"></div></div>
+    </div>
+    <!-- FORM -->
+    <div class="card">
+      <h3>Transaction Details</h3>
+      <input type="hidden" id="f-bundle">
+      <div class="g2">
+        <div class="field"><label>Sold Type</label><select id="f-soldtype" onchange="onSoldTypeChange()"><option value="Walk-in">Walk-in</option><option value="Pasa">Pasa (Promoter)</option></select></div>
+        <div class="field" id="promoterField" style="display:none;"><label>Promoter Name</label><input type="text" id="f-promoter" placeholder="e.g. Abdul"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label>Variant / RAM / Storage</label><input type="text" id="f-vro" readonly></div>
+        <div class="field">
+          <label>Color(s)</label>
+          <div id="colorFields"></div>
+          <datalist id="colorOptions"></datalist>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:12px;">
+        <div class="field"><label>Quantity</label><input type="number" id="f-qty" value="1" min="1" oninput="renderColorFields(parseInt(this.value)||1);recalc()"></div>
+        <div class="field" id="pasaField" style="display:none;"><label>Pasa Price (₱)</label><input type="number" id="f-pasa" placeholder="0" oninput="recalc()"></div>
+      </div>
+      <div class="field" style="margin-top:12px;margin-bottom:16px;"><label>Payment Method</label><select id="f-payment"><option>Cash</option><option>Card</option><option>Home Credit</option></select></div>
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px;">
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;" id="c-total-label">Price</div>
+          <div class="mono" id="c-total" style="font-size:26px;font-weight:700;color:var(--accent);">—</div>
+        </div>
+      </div>
+      <!-- Customer Info (optional, only for first item in SO) -->
+      <div id="custInfoSection" style="margin-top:16px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:600;color:var(--accent);">👤 Customer Info <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></div>
+          <button class="btn btn-ghost btn-sm" onclick="toggleCustomerInfo()" id="custInfoToggle" style="font-size:12px;color:var(--accent);">+ Add</button>
+        </div>
+        <div id="custInfoFields" style="display:none;background:var(--bg);border-radius:10px;padding:14px;border:1.5px solid var(--border);">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6;">ℹ️ For marketing promotions and product concerns only. Customer info is never shared with third parties.</div>
+          <div class="g2" style="margin-bottom:8px;">
+            <div class="field"><label>Name</label><input type="text" id="cust-name" placeholder="Customer name"></div>
+            <div class="field"><label>Contact No.</label><input type="text" id="cust-contact" placeholder="09XX-XXX-XXXX"></div>
+          </div>
+          <div class="field"><label>Email <span style="font-weight:400;color:var(--muted);">(optional)</span></label><input type="text" id="cust-email" placeholder="email@example.com"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn btn-outline" onclick="addAnotherItem()" style="flex:1;">+ Add Another Item</button>
+        <button class="btn btn-primary btn-lg" onclick="goToReview()" style="flex:2;">Review Sale →</button>
+      </div>
+    </div>
+  </div>
+  <!-- S3: REVIEW -->
+  <div id="s-review" style="display:none;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <button class="btn btn-outline btn-sm" onclick="showS('picker')">← Back to Products</button>
+      <div><h2 style="margin:0;">Review Sale</h2><p style="font-size:13px;color:var(--muted);margin:0;">Confirm details with customer before submitting.</p></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;"><h3>Sale Summary</h3><div id="reviewContent"></div></div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-outline btn-sm" onclick="addItemFromReview()" style="flex:1;font-size:13px;">+ Add Item</button>
+      <button class="btn btn-success btn-lg" id="confirmSaleBtn" onclick="confirmSale()" style="flex:2;">✓ Customer Approved — Confirm</button>
+    </div>
+  </div>
+  <!-- S4: REPORT -->
+  <div id="s-report" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn btn-outline btn-sm" onclick="showS('picker')">← Add More</button>
+        <div><h2 style="margin:0;">Today's Report</h2><p style="font-size:13px;color:var(--muted);margin:0;" id="reportDate"></p></div>
+      </div>
+      <div id="targetBadge2" style="font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;background:#fef3c7;color:#d97706;">Target: ₱3,000</div>
+    </div>
+    <div class="tbl" style="margin-bottom:18px;overflow-x:auto;">
+      <table>
+        <thead><tr><th>SO#</th><th>Code</th><th>Item</th><th>Variant</th><th>Color</th><th>Qty</th><th>SRP</th><th>Sold Price</th><th>Pasa</th><th>Discount</th><th>Net Sales</th><th>Payment</th><th>Type</th><th></th></tr></thead>
+        <tbody id="salesBody"><tr><td colspan="13" style="text-align:center;color:var(--muted);padding:28px;">No transactions yet.</td></tr></tbody>
+        <tfoot id="salesFoot" style="display:none;"><tr style="background:var(--accent-light);font-weight:700;">
+          <td colspan="7" style="padding:10px 14px;color:var(--accent);">TOTAL</td>
+          <td class="mono" id="tot-sold" style="padding:10px 14px;color:var(--accent);"></td>
+          <td class="mono" id="tot-pasa" style="padding:10px 14px;color:var(--accent);"></td>
+          <td class="mono" id="tot-disc" style="padding:10px 14px;color:var(--red);"></td>
+          <td class="mono" id="tot-net" style="padding:10px 14px;color:var(--green);"></td>
+          <td colspan="3"></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <div id="summarySection" style="display:none;">
+      <div class="g3" style="margin-bottom:14px;">
+        <div class="card">
+          <h3>📊 Sales Summary</h3>
+          <div style="font-size:13px;line-height:2.4;">
+            <div style="display:flex;justify-content:space-between;"><span>Gross:</span><span class="mono" id="s-gross" style="font-weight:700;color:var(--accent);"></span></div>
+            <div style="display:flex;justify-content:space-between;"><span>Discounts:</span><span class="mono" id="s-disc" style="font-weight:700;color:var(--red);"></span></div>
+            <div style="display:flex;justify-content:space-between;"><span>Net Sales:</span><span class="mono" id="s-net" style="font-weight:700;color:var(--green);"></span></div>
+            <div style="border-top:1px solid var(--border);margin:8px 0;"></div>
+            <div style="display:flex;justify-content:space-between;"><span>Cash:</span><span class="mono" id="s-cash"></span></div>
+            <div style="display:flex;justify-content:space-between;"><span>Card:</span><span class="mono" id="s-card"></span></div>
+            <div style="display:flex;justify-content:space-between;"><span>Home Credit:</span><span class="mono" id="s-hc"></span></div>
+          </div>
+        </div>
+        <div class="card"><h3>👤 Staff's Sales</h3><div style="font-size:13px;line-height:2.4;" id="s-staff"></div></div>
+        <div class="card">
+          <h3>🎯 Result</h3>
+          <div id="s-result" style="font-size:20px;font-weight:700;margin-bottom:8px;"></div>
+          <div style="font-size:13px;color:var(--muted);">Daily Target: <strong>₱3,000.00</strong></div>
+          <div style="margin-top:14px;display:flex;gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="submitDayReport()">📤 Submit</button>
+            <button class="btn btn-outline btn-sm" onclick="printReport()">🖨 Print</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVENTORY PAGE -->
+<div class="page" id="page-inventory">
+  <h2>Inventory</h2><p class="subtitle">Live stock levels.</p>
+  <div class="stats-row">
+    <div class="sc"><div class="sl">Total SKUs</div><div class="sv" id="iv-tot">—</div></div>
+    <div class="sc"><div class="sl">Out of Stock</div><div class="sv red" id="iv-out">—</div></div>
+    <div class="sc"><div class="sl">Low Stock</div><div class="sv yellow" id="iv-low">—</div></div>
+    <div class="sc"><div class="sl">Healthy</div><div class="sv green" id="iv-ok">—</div></div>
+  </div>
+  <div class="tbl"><table><thead><tr><th>Category</th><th>Product</th><th>Variant</th><th>Colors</th><th>SRP</th><th>Stock</th><th>Status</th></tr></thead><tbody id="invBody"></tbody></table></div>
+</div>
+
+<!-- PO PAGE -->
+<div class="page" id="page-po">
+  <h2>Purchase Orders</h2><p class="subtitle">One active PO accumulates until marked as Sent.</p>
+  <div id="poList"><div style="text-align:center;padding:40px;color:var(--muted);">No purchase orders yet.</div></div>
+
+  <!-- PO Edit Modal -->
+  <div id="poEditModal" style="display:none;position:fixed;inset:0;background:rgba(27,46,107,.35);z-index:400;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;max-width:600px;width:100%;box-shadow:0 16px 48px rgba(27,46,107,.2);max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="font-size:17px;font-weight:700;color:var(--accent);">Edit Purchase Order <span id="poEditId" class="mono" style="font-size:14px;"></span></h3>
+        <button class="btn btn-ghost btn-sm" onclick="closePOEdit()">✕</button>
+      </div>
+      <div id="poEditItems" style="margin-bottom:16px;"></div>
+      <!-- Add new line item -->
+      <div class="card" style="background:var(--bg);">
+        <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:10px;">+ Add Line Item</div>
+        <div class="g3" style="margin-bottom:8px;">
+          <div class="field" style="grid-column:span 2;"><label>Item Name</label><input type="text" id="po-new-item" placeholder="Product name" list="poItemList"><datalist id="poItemList"></datalist></div>
+          <div class="field"><label>Qty</label><input type="number" id="po-new-qty" value="1" min="1" style="max-width:80px;"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px;"><label>Color / Notes</label><input type="text" id="po-new-color" placeholder="e.g. Assorted, Midnight Black"></div>
+        <button class="btn btn-primary btn-sm" onclick="addPOLineItem()">Add to PO</button>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+        <button class="btn btn-outline" onclick="closePOEdit()">Cancel</button>
+        <button class="btn btn-success" onclick="savePOEdit()">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MASTER LIST PAGE -->
+<div class="page" id="page-masterlist">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <div><h2>Master List</h2><p class="subtitle" style="margin:0;">Manage products, pricing, colors and availability.</p></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline btn-sm" onclick="openNewItemModal()">+ New Item</button>
+      <button class="btn btn-primary btn-sm" onclick="saveMasterList()">💾 Save Changes</button>
+    </div>
+  </div>
+
+  <!-- Bundles section -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div><h3 style="margin:0;">🎁 Promotions</h3><div style="font-size:12px;color:var(--muted);margin-top:2px;">Seasonal promotions appear on Screen 1 alongside products.</div></div>
+      <button class="btn btn-outline btn-sm" onclick="openNewBundleModal()">+ New Promotion</button>
+    </div>
+    <div id="bundleList"><div style="font-size:13px;color:var(--muted);padding:8px 0;">No promotions defined yet.</div></div>
+  </div>
+
+  <!-- Product Freebies -->
+  <div class="card" style="margin-bottom:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div><h3 style="margin:0;">🎁 Product Freebies</h3><div style="font-size:12px;color:var(--muted);margin-top:2px;">Attach a free accessory to a phone/tablet. Shows automatically on Screen 2 when that product is selected.</div></div>
+      <button class="btn btn-outline btn-sm" onclick="openFreebieModal()">+ New Freebie</button>
+    </div>
+    <div id="freebieList"><div style="font-size:13px;color:var(--muted);padding:8px 0;">No freebies defined yet.</div></div>
+  </div>
+
+  <!-- Search -->
+  <div class="sw" style="margin-bottom:12px;"><span class="si">🔍</span><input type="text" id="mlSearch" placeholder="Search products..." oninput="renderML()"></div>
+
+  <div class="tbl" style="overflow-x:auto;">
+    <table><thead><tr><th>Category</th><th>Product</th><th>Variant</th><th>Colors</th><th>Unit Price (₱)</th><th>SRP (₱)</th><th>Status</th></tr></thead>
+    <tbody id="mlBody"></tbody></table>
+  </div>
+
+  <!-- New Item Modal -->
+  <div id="newItemModal" style="display:none;position:fixed;inset:0;background:rgba(27,46,107,.35);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;max-width:480px;width:100%;box-shadow:0 16px 48px rgba(27,46,107,.2);">
+      <h3 style="font-size:17px;font-weight:700;color:var(--accent);margin-bottom:16px;">New Product</h3>
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="field"><label>Category</label>
+          <select id="ni-cat">
+            <option>Bar Phone</option><option selected>Smart Phone</option><option>Tablet</option>
+            <option>Earbuds</option><option>Smart Watch</option><option>Power Bank</option><option>Others</option>
+          </select>
+        </div>
+        <div class="field"><label>Product Name</label><input type="text" id="ni-name" placeholder="e.g. A50C"></div>
+      </div>
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="field"><label>RAM</label><input type="text" id="ni-ram" placeholder="e.g. 4GB (optional)"></div>
+        <div class="field"><label>Storage</label><input type="text" id="ni-storage" placeholder="e.g. 128GB (optional)"></div>
+      </div>
+      <div class="g2" style="margin-bottom:12px;">
+        <div class="field"><label>Unit Price (₱)</label><input type="number" id="ni-unitprice" placeholder="0"></div>
+        <div class="field"><label>SRP (₱)</label><input type="number" id="ni-srp" placeholder="0"></div>
+      </div>
+      <div class="field" style="margin-bottom:16px;"><label>Colors (comma-separated)</label><input type="text" id="ni-colors" placeholder="e.g. Black, White, Blue"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="closeNewItemModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewItem()">Add to Master List</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Bundle Modal -->
+  <div id="newBundleModal" style="display:none;position:fixed;inset:0;background:rgba(27,46,107,.35);z-index:400;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;max-width:560px;width:100%;box-shadow:0 16px 48px rgba(27,46,107,.2);max-height:90vh;overflow-y:auto;">
+      <h3 style="font-size:17px;font-weight:700;color:var(--accent);margin-bottom:6px;">New Promotion</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Select a main item (phone/tablet) and one accessory. These are seasonal promotions.</p>
+      <div class="field" style="margin-bottom:12px;"><label>Promotion Name</label><input type="text" id="nb-name" placeholder="e.g. Starter Bundle, Promo Pack"></div>
+      <div class="field" style="margin-bottom:12px;"><label>Promotion Price (₱) — total to charge customer</label><input type="number" id="nb-price" placeholder="0"></div>
+      <div class="field" style="margin-bottom:12px;"><label>Main Item (Phone or Tablet)</label>
+        <select id="nb-main" style="width:100%;">
+          <option value="">— Select main item —</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:16px;"><label>Accessory / Add-on</label>
+        <select id="nb-addon" style="width:100%;">
+          <option value="">— Select accessory —</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="closeNewBundleModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewBundle()">Save Promotion</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Freebie Modal -->
+  <div id="freebieModal" style="display:none;position:fixed;inset:0;background:rgba(27,46,107,.35);z-index:400;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);">
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:28px;max-width:480px;width:100%;box-shadow:0 16px 48px rgba(27,46,107,.2);">
+      <h3 style="font-size:17px;font-weight:700;color:var(--accent);margin-bottom:6px;">Attach a Freebie</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Select a product and the free accessory that comes with it. Shows on Screen 2 but not charged to customer.</p>
+      <div class="field" style="margin-bottom:12px;"><label>Main Product (Phone / Tablet / Bar Phone)</label>
+        <select id="fr-main" style="width:100%;"><option value="">— Select product —</option></select>
+      </div>
+      <div class="field" style="margin-bottom:16px;"><label>Freebie / Free Item</label>
+        <select id="fr-addon" style="width:100%;"><option value="">— Select freebie —</option></select>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="document.getElementById('freebieModal').style.display='none'">Cancel</button>
+        <button class="btn btn-primary" onclick="saveFreebie()">Save Freebie</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SETUP PAGE -->
+<div class="page" id="page-settings">
+  <h2>Settings</h2><p class="subtitle">Configure store operations and thresholds.</p>
+  <div class="card" style="max-width:520px;">
+    <h3>🎯 Sales Target</h3>
+    <div class="field" style="margin-bottom:16px;">
+      <label>Daily Net Sales Target (₱)</label>
+      <input type="number" id="set-target" placeholder="3000" style="max-width:200px;">
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Staff progress is measured against this each day.</div>
+    </div>
+  </div>
+  <div class="card" style="max-width:520px;">
+    <h3>📦 Inventory Thresholds</h3>
+    <div class="field" style="margin-bottom:16px;">
+      <label>Low Stock Threshold (units)</label>
+      <input type="number" id="set-lowstock" placeholder="2" style="max-width:200px;">
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">Items at or below this level show a LOW badge and are flagged.</div>
+    </div>
+    <div class="field" style="margin-bottom:0;">
+      <label>Default Reorder Point (units)</label>
+      <input type="number" id="set-reorder" placeholder="1" style="max-width:200px;">
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">PO is triggered when stock hits this level. Applies to all products.</div>
+    </div>
+  </div>
+  <div class="card" style="max-width:520px;">
+    <h3>📋 Per-Item Reorder Points</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Override the global reorder point for specific items.</p>
+    <div class="tbl" style="overflow-x:auto;">
+      <table><thead><tr><th>Product</th><th>Variant</th><th>Current Stock</th><th>Reorder At</th></tr></thead>
+      <tbody id="reorderBody"></tbody></table>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+      <button class="btn btn-outline" onclick="applyGlobalReorder()">Apply Global to All</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-setup">
+  <h2>Setup</h2><p class="subtitle">Connect to Google Sheets for persistent reports.</p>
+  <div class="card"><div class="stepb">1</div><h3>Create Your Google Sheet</h3><p style="font-size:13px;color:var(--muted);line-height:1.7;">Go to <strong>sheets.google.com</strong>, create a blank sheet, name it <strong>Khonsu Tech Operations</strong>.</p></div>
+  <div class="card">
+    <div class="stepb">2</div><h3>Add the Apps Script</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Go to <strong>Extensions → Apps Script</strong>, paste below, then <strong>Deploy → New Deployment → Web App</strong> (access: Anyone).</p>
+    <div class="code-block"><button class="cpbtn" onclick="copyScript()">Copy</button><span id="scriptText">// Khonsu Tech Operations — Apps Script Backend
+const SS = SpreadsheetApp.getActiveSpreadsheet();
+
+function doPost(e) {
+  try {
+    const d = JSON.parse(e.postData.contents);
+    if (d.action === 'init')          return initSheets();
+    if (d.action === 'logSale')       return logSale(d);
+    if (d.action === 'logPO')         return logPO(d);
+    if (d.action === 'pushInventory') return pushInventory(d);
+    if (d.action === 'pushMasterList') return pushMasterList(d);
+    return respond({error:'Unknown action'});
+  } catch(err) { return respond({error:err.toString()}); }
+}
+
+function doGet(e) {
+  if (e.parameter.action === 'ping') return respond({status:'ok'});
+  if (e.parameter.action === 'getMasterList') return getMasterList();
+  return respond({status:'Khonsu Tech OPS running'});
+}
+
+function getMasterList() {
+  const sh = SS.getSheetByName('Master List') || SS.getSheetByName('Inventory');
+  if (!sh) return respond({error:'No Master List sheet found'});
+  const data = sh.getDataRange().getValues();
+  if (data.length < 2) return respond({rows:[]});
+  const headers = data[0].map(h => String(h).toLowerCase().trim());
+  const rows = data.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = row[i]);
+    return obj;
+  });
+  return respond({rows});
+}
+
+function initSheets() {
+  const tabs = {
+    'Sales Log': ['Date','Bundle','Item','Variant','Color','Qty','Unit Price','SRP','Sold Price','Pasa Price','Discount','Net Sales','Payment','Sold Type','Promoter','Staff'],
+    'Inventory': ['Category','Model','RAM','Storage','Colors','Unit Price','SRP','Stock','Reorder Point'],
+    'Purchase Orders': ['PO Number','Date','Supplier','Items','Quantities','Status','Approver']
+  };
+  Object.entries(tabs).forEach(([name,headers]) => {
+    let sh = SS.getSheetByName(name);
+    if (!sh) sh = SS.insertSheet(name);
+    if (sh.getLastRow() === 0) {
+      sh.appendRow(headers);
+      sh.getRange(1,1,1,headers.length).setFontWeight('bold').setBackground('#1b2e6b').setFontColor('white');
+    }
+  });
+  return respond({status:'Initialized'});
+}
+
+function logSale(d) {
+  const sh  = SS.getSheetByName('Sales Log');
+  const inv = SS.getSheetByName('Inventory');
+  const rows = d.rows || [];
+  rows.forEach(r => {
+    sh.appendRow([d.date, r.promoCode||'', r.itemName, r.variant||'', r.color||'',
+      r.qty, r.unitPrice, r.srp, r.soldPrice, r.pasaPrice||0,
+      r.discount||0, r.netSales||0, r.payment, r.soldType, r.promoter||'', r.staff]);
+  });
+  if (inv) {
+    const data = inv.getDataRange().getValues();
+    rows.forEach(r => {
+      for (let i = 1; i < data.length; i++) {
+        const k = data[i][1]+(data[i][2]?' '+data[i][2]:'')+(data[i][3]?'/'+data[i][3]:'');
+        if (k.trim() === (r.productKey||'').trim()) {
+          inv.getRange(i+1,8).setValue(Math.max(0, Number(data[i][7]) - r.qty));
+          break;
+        }
+      }
+    });
+  }
+  return respond({status:'Sale logged', count: rows.length});
+}
+
+function logPO(d) {
+  const sh = SS.getSheetByName('Purchase Orders');
+  const items = (d.items||[]).map(i=>i.name).join(', ');
+  const qtys  = (d.items||[]).map(i=>i.qty).join(', ');
+  sh.appendRow([d.id, d.date, d.supplier, items, qtys, d.status||'Pending', d.approver]);
+  return respond({status:'PO logged'});
+}
+
+function pushInventory(d) {
+  const sh = SS.getSheetByName('Inventory');
+  if (!sh) return respond({error:'No Inventory sheet'});
+  // Clear existing data (except header)
+  if (sh.getLastRow() > 1) sh.deleteRows(2, sh.getLastRow()-1);
+  (d.rows||[]).forEach(r => sh.appendRow(r));
+  return respond({status:'Pushed', count:(d.rows||[]).length});
+}
+
+function pushMasterList(d) {
+  let sh = SS.getSheetByName('Master List');
+  if (!sh) {
+    sh = SS.insertSheet('Master List');
+    sh.appendRow(['Category','Model','RAM','Storage','Colors','Unit Price','SRP','Status']);
+    sh.getRange(1,1,1,8).setFontWeight('bold').setBackground('#1b2e6b').setFontColor('white');
+  }
+  if (sh.getLastRow() > 1) sh.deleteRows(2, sh.getLastRow()-1);
+  (d.rows||[]).forEach(r => sh.appendRow(r));
+  return respond({status:'Master List pushed', count:(d.rows||[]).length});
+}
+
+function respond(data) {
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}</span></div>
+  </div>
+  <div class="card">
+    <div class="stepb">3</div><h3>Connect the App</h3>
+    <div style="display:flex;gap:10px;margin-bottom:10px;"><input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/..." style="flex:1;"><button class="btn btn-primary" onclick="connectSheet()">Connect</button></div>
+    <div id="connectStatus" style="font-size:13px;color:var(--muted);"></div>
+  </div>
+  <div class="card"><div class="stepb">4</div><h3>Push Master List</h3><p style="font-size:13px;color:var(--muted);margin-bottom:12px;">One-time push of all products to the Inventory sheet.</p><button class="btn btn-success" onclick="pushInventory()">Push Master List</button><span id="pushStatus" style="margin-left:12px;font-size:13px;color:var(--muted);"></span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADDON_CATS=['Smart Phone','Tablet'];
+const DAILY_TARGET=()=>settings.dailyTarget;
+const COLORS={'Bar Phone':['Black','White'],'Smart Phone':['Midnight Black','Starlight White','Ocean Blue','Forest Green','Sunset Gold','Mystic Purple','Coral Pink','Titanium Grey'],'Tablet':['Midnight Black','Starlight White','Ocean Blue','Titanium Grey'],'Earbuds':['Black','White','Blue'],'Smart Watch':['Black','Silver','Rose Gold','Blue'],'Power Bank':['Black','White'],'Others':['Black','White']};
+const DEF=[
+  {category:'Bar Phone',name:'ITEL 2165',ram:'',storage:'',unitPrice:402,srp:1699},
+  {category:'Bar Phone',name:'ITEL 5032',ram:'',storage:'',unitPrice:487,srp:1999},
+  {category:'Bar Phone',name:'POWER 120',ram:'',storage:'',unitPrice:531,srp:2199},
+  {category:'Bar Phone',name:'9310 NEO',ram:'',storage:'',unitPrice:999,srp:2999},
+  {category:'Smart Phone',name:'A50C',ram:'2GB',storage:'32GB',unitPrice:2603,srp:2799},
+  {category:'Smart Phone',name:'A50C',ram:'2GB',storage:'64GB',unitPrice:2789,srp:2999},
+  {category:'Smart Phone',name:'A50',ram:'3GB',storage:'64GB',unitPrice:2882,srp:3099},
+  {category:'Smart Phone',name:'A50',ram:'4GB',storage:'64GB',unitPrice:2976,srp:3199},
+  {category:'Smart Phone',name:'A80',ram:'4GB',storage:'128GB',unitPrice:3719,srp:3999},
+  {category:'Smart Phone',name:'A90',ram:'3GB',storage:'128GB',unitPrice:3403,srp:3699},
+  {category:'Smart Phone',name:'A90',ram:'4GB',storage:'256GB',unitPrice:4047,srp:4499},
+  {category:'Smart Phone',name:'A100C',ram:'3GB',storage:'64GB',unitPrice:4139,srp:4899},
+  {category:'Smart Phone',name:'A100C',ram:'3GB',storage:'128GB',unitPrice:4599,srp:5299},
+  {category:'Smart Phone',name:'A200',ram:'3GB',storage:'128GB',unitPrice:4415,srp:5199},
+  {category:'Smart Phone',name:'CITY 100',ram:'4GB',storage:'128GB',unitPrice:3680,srp:3999},
+  {category:'Smart Phone',name:'CITY 100',ram:'8GB',storage:'128GB',unitPrice:5059,srp:5799},
+  {category:'Smart Phone',name:'P55 4G',ram:'8GB',storage:'256GB',unitPrice:4415,srp:4799},
+  {category:'Smart Phone',name:'P55+ 4G',ram:'8GB',storage:'256GB',unitPrice:4959,srp:5399},
+  {category:'Smart Phone',name:'P55 5G',ram:'6GB',storage:'128GB',unitPrice:5059,srp:5499},
+  {category:'Smart Phone',name:'P70',ram:'4GB',storage:'128GB',unitPrice:4875,srp:5599},
+  {category:'Smart Phone',name:'P70',ram:'4GB',storage:'256GB',unitPrice:4600,srp:5199},
+  {category:'Smart Phone',name:'RS4',ram:'8GB',storage:'128GB',unitPrice:5519,srp:5999},
+  {category:'Smart Phone',name:'RS4',ram:'8GB',storage:'256GB',unitPrice:5979,srp:6599},
+  {category:'Smart Phone',name:'RS4',ram:'12GB',storage:'256GB',unitPrice:6439,srp:7199},
+  {category:'Smart Phone',name:'S25',ram:'8GB',storage:'128GB',unitPrice:4836,srp:5599},
+  {category:'Smart Phone',name:'S25 Ultra',ram:'8GB',storage:'256GB',unitPrice:7439,srp:7999},
+  {category:'Smart Phone',name:'S25 Ultra',ram:'8GB',storage:'512GB',unitPrice:9299,srp:9999},
+  {category:'Smart Phone',name:'S26 Ultra',ram:'8GB',storage:'128GB',unitPrice:7360,srp:7999},
+  {category:'Smart Phone',name:'S26 Ultra',ram:'8GB',storage:'256GB',unitPrice:9659,srp:10999},
+  {category:'Tablet',name:'VISTA TAB GO',ram:'4GB',storage:'64GB',unitPrice:4875,srp:5299},
+  {category:'Tablet',name:'VISTA TAB 10',ram:'4GB',storage:'128GB',unitPrice:5114,srp:5499},
+  {category:'Tablet',name:'VISTA TAB 30',ram:'4GB',storage:'128GB',unitPrice:5393,srp:5799},
+  {category:'Tablet',name:'VISTA TAB 30S',ram:'4GB',storage:'128GB',unitPrice:7360,srp:7999},
+  {category:'Tablet',name:'VISTA TAB 30 PRO',ram:'8GB',storage:'256GB',unitPrice:9199,srp:9999},
+  {category:'Earbuds',name:'EARBUDS NEO',ram:'',storage:'',unitPrice:319,srp:1299},
+  {category:'Earbuds',name:'EARPHONE BUDS AIR 2',ram:'',storage:'',unitPrice:359,srp:1795},
+  {category:'Smart Watch',name:'011 SMART WATCH',ram:'',storage:'',unitPrice:400,srp:1699},
+  {category:'Smart Watch',name:'020 SMART WATCH',ram:'',storage:'',unitPrice:495,srp:2199},
+  {category:'Smart Watch',name:'015 SMART WATCH',ram:'',storage:'',unitPrice:520,srp:2099},
+  {category:'Smart Watch',name:'023 SMART WATCH',ram:'',storage:'',unitPrice:577,srp:2399},
+  {category:'Smart Watch',name:'APEX N10',ram:'',storage:'',unitPrice:1630,srp:6299},
+  {category:'Power Bank',name:'T144',ram:'',storage:'',unitPrice:239,srp:999},
+  {category:'Power Bank',name:'A1421',ram:'',storage:'',unitPrice:560,srp:2299},
+  {category:'Others',name:'PP131A (TAB 30 PRO)',ram:'',storage:'',unitPrice:799,srp:3199},
+  {category:'Others',name:'PK131A (TAB 30 PRO)',ram:'',storage:'',unitPrice:1199,srp:4799},
+  {category:'Others',name:'Leather Case (TAB 10)',ram:'',storage:'',unitPrice:199,srp:799},
+  {category:'Others',name:'Leather Case (TAB 30)',ram:'',storage:'',unitPrice:199,srp:799},
+];
+
+let currentUser=null,PRODUCTS=[],masterList=[],predefinedBundles=[],productFreebies={},settings={dailyTarget:3000,lowStockThreshold:2,globalReorder:1},inventory={},saleRows=[],pendingItems=[],currentSO=null,soCounter=parseInt(localStorage.getItem('kt_so')||'0'),selectedProduct=null,selectedAddon=null,selectedBundle=null,activeCat='Smart Phone',searchQ='',addonCat='All',bundleCounter=parseInt(localStorage.getItem('kt_pc')||'0'),purchaseOrders=JSON.parse(localStorage.getItem('kt_pos')||'[]'),scriptUrl=localStorage.getItem('kt_url')||'';
+
+function ik(p){let k=p.name;if(p.ram)k+=' '+p.ram;if(p.storage)k+='/'+p.storage;return k;}
+function vl(p){return(p.ram&&p.storage)?p.ram+' / '+p.storage:'';}
+function fmt(n){return n===0||!n?'N/A':'₱'+Number(n).toLocaleString('en-PH',{minimumFractionDigits:2});}
+
+function init(){
+  const saved=localStorage.getItem('kt_ml');
+  if(saved){masterList=JSON.parse(saved);}
+  else{masterList=DEF.map(p=>({...p,obsolete:false,colors:(COLORS[p.category]||['Black','White']).join(', ')}));localStorage.setItem('kt_ml',JSON.stringify(masterList));}
+  PRODUCTS=masterList.filter(p=>!p.obsolete);
+  const inv=localStorage.getItem('kt_inv');
+  if(inv){inventory=JSON.parse(inv);}
+  else{masterList.forEach(p=>{inventory[ik(p)]={stock:4,reorder:1};});saveInv();}
+  predefinedBundles=JSON.parse(localStorage.getItem('kt_bundles')||'[]');
+  productFreebies=JSON.parse(localStorage.getItem('kt_freebies')||'{}');
+  const savedSettings=localStorage.getItem('kt_settings');
+  if(savedSettings)settings=Object.assign(settings,JSON.parse(savedSettings));
+  if(scriptUrl)document.getElementById('scriptUrl').value=scriptUrl;
+}
+function saveInv(){localStorage.setItem('kt_inv',JSON.stringify(inventory));}
+
+// AUTH
+function login(user){
+  currentUser=user;
+  document.getElementById('lockScreen').style.display='none';
+  document.getElementById('userPill').textContent='👤 '+user+' — Switch';
+  const adminTabs=['tab-inventory','tab-po','tab-ml','tab-settings','tab-setup'];
+  adminTabs.forEach(id=>document.getElementById(id).style.display=user==='Admin'?'':'none');
+  buildCatFilter();renderProducts();
+  // Auto-sync pricing from sheet if connected
+  if(scriptUrl){
+    setTimeout(()=>{
+      syncPricingFromSheet().catch(()=>{});
+    },800);
+  }
+  toast('Welcome, '+user+'!','success');
+}
+function logout(){currentUser=null;document.getElementById('lockScreen').style.display='flex';showPage('sales',null);showS('picker');}
+
+// PAGE NAV
+function showPage(name,e){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(e&&e.target)e.target.classList.add('active');
+  if(name==='inventory')renderInv();
+  if(name==='po')renderPOs();
+  if(name==='masterlist')renderML();
+  if(name==='settings')renderSettings();
+}
+
+// SCREEN NAV
+function showS(name){
+  ['picker','detail','review','report'].forEach(s=>document.getElementById('s-'+s).style.display=s===name?'block':'none');
+  if(name==='report'){renderSalesTable();renderSummary();document.getElementById('reportDate').textContent=new Date().toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+  if(name==='picker')renderProducts();
+}
+
+// PRODUCT GRID
+function buildCatFilter(){
+  const cats=['All',...new Set(PRODUCTS.map(p=>p.category))];
+  if(predefinedBundles.length)cats.splice(1,0,'Promotions');
+  const el=document.getElementById('catFilter');
+  el.innerHTML=cats.map(c=>'<button class="cat-btn'+(c===activeCat?' active':'')+'" data-c="'+encodeURIComponent(c)+'">'+c+'</button>').join('');
+  el.onclick=function(e){const b=e.target.closest('.cat-btn');if(!b)return;activeCat=decodeURIComponent(b.dataset.c);el.querySelectorAll('.cat-btn').forEach(x=>x.classList.toggle('active',x===b));renderProducts();};
+}
+function filterProducts(){searchQ=document.getElementById('searchInput').value.toLowerCase();renderProducts();}
+function renderProducts(){
+  const grid=document.getElementById('productGrid');
+
+  // If Bundles category — show bundle cards
+  if(activeCat==='Promotions'){
+    const bmap={};
+    grid.innerHTML=predefinedBundles.map((b,i)=>{
+      bmap[i]=b.id;
+      const mainP=PRODUCTS.find(p=>ik(p)===b.mainKey),addonP=PRODUCTS.find(p=>ik(p)===b.addonKey);
+      const mainInv=inventory[b.mainKey]||{stock:0},addonInv=inventory[b.addonKey]||{stock:0};
+      const isOut=mainInv.stock<=0||addonInv.stock<=0;
+      return '<div class="pc'+(isOut?' oos':'')+'" data-bi="'+i+'" style="grid-column:span 1;">' +
+        '<div class="sb '+(isOut?'sout':'sok')+'">'+(isOut?'OUT':'In Stock')+'</div>' +
+        '<div class="cl">Promotion</div>' +
+        '<div class="pn">'+b.name+'</div>' +
+        '<div class="pv" style="font-size:11px;line-height:1.5;margin-bottom:6px;">📱 '+b.mainName+'<br>🎧 '+b.addonName+'</div>' +
+        '<div class="pp">₱'+b.price.toLocaleString()+'</div>' +
+        '</div>';
+    }).join('')||'<div style="padding:40px;text-align:center;color:var(--muted);">No promotions defined. Create one in Master List.</div>';
+    grid.onclick=function(e){
+      const c=e.target.closest('.pc');if(!c||c.classList.contains('oos'))return;
+      const b=predefinedBundles[parseInt(c.dataset.bi)];if(b)openBundleDetail(b);
+    };
+
+    return;
+  }
+
+  const filtered=PRODUCTS.filter(p=>(activeCat==='All'||p.category===activeCat)&&(p.name+' '+vl(p)).toLowerCase().includes(searchQ));
+  const map={};
+  grid.innerHTML=filtered.map((p,i)=>{
+    const key=ik(p);map[i]=key;
+    const inv=inventory[key]||{stock:0,reorder:1};
+    const isOut=inv.stock<=0,isLow=!isOut&&inv.stock<=settings.lowStockThreshold;
+    let sc='sok',sl=inv.stock+' left';
+    if(isOut){sc='sout';sl='OUT';}else if(isLow){sc='slow';sl='LOW:'+inv.stock;}
+    return '<div class="pc'+(isOut?' oos':'')+'" data-i="'+i+'"><div class="sb '+sc+'">'+sl+'</div><div class="cl">'+p.category+'</div><div class="pn">'+p.name+'</div><div class="pv">'+(vl(p)||'—')+'</div><div class="pp">₱'+p.srp.toLocaleString()+'</div></div>';
+  }).join('')||'<div style="padding:40px;text-align:center;color:var(--muted);">No products found.</div>';
+  grid.onclick=function(e){const c=e.target.closest('.pc');if(!c||c.classList.contains('oos'))return;const k=map[parseInt(c.dataset.i)];if(k)openDetail(k);};
+  const totalPending=pendingItems.length;
+  const fb=document.getElementById('floatBtn');
+  const fbBtn=document.getElementById('floatBtnInner');
+  if(totalPending>0){
+    fb.style.display='block';
+    if(fbBtn){fbBtn.textContent='🛒 Review ('+totalPending+' item'+(totalPending!==1?'s':'')+')';fbBtn.onclick=function(){goToReview();};}
+  } else if(saleRows.length>0){
+    fb.style.display='block';
+    if(fbBtn){fbBtn.textContent='📋 View Report ('+saleRows.length+')';fbBtn.onclick=function(){showS('report');};}
+  } else {
+    fb.style.display='none';
+  }
+}
+
+// DETAIL SCREEN
+function openBundleDetail(b){
+  const mainP=PRODUCTS.find(p=>ik(p)===b.mainKey);
+  const addonP=PRODUCTS.find(p=>ik(p)===b.addonKey);
+  if(!mainP||!addonP){toast('Promotion items not found in active products','error');return;}
+  openDetail(b.mainKey);
+  setTimeout(()=>{
+    // Generate promo code
+    bundleCounter++;localStorage.setItem('kt_pc',bundleCounter);
+    const d=new Date(),dp=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    document.getElementById('f-bundle').value='PRO-'+dp+'-'+String(bundleCounter).padStart(3,'0');
+    document.getElementById('f-bundle').dataset.bundlePrice=b.price;
+    document.getElementById('f-bundle').dataset.bundleName=b.name;
+    document.getElementById('f-bundle').dataset.promoAddonKey=b.addonKey;
+    document.getElementById('f-bundle').dataset.promoAddonName=addonP.name;
+    // Do NOT set selectedAddon — promotion item is NOT an add-on
+    selectedAddon=null;
+    // Show freebie section as promotion included item; hide user add-on picker
+    document.getElementById('addonSec').style.display='none';
+    document.getElementById('freebieSec').style.display='flex';
+    document.getElementById('freebieItemName').textContent=addonP.name+' — included in Promotion';
+    // Update price strip to show bundle price
+    document.getElementById('d-srp').textContent='₱'+b.price.toLocaleString();
+    document.getElementById('d-cat').textContent='Promotion';
+    document.getElementById('c-total-label').textContent='Promotion Price';
+    document.getElementById('c-total').textContent='₱'+b.price.toLocaleString();
+  },50);
+}
+
+function recalcBundle(bundlePrice){
+  document.getElementById('c-disc').textContent='N/A';
+  document.getElementById('c-total').textContent='₱'+bundlePrice.toLocaleString();
+}
+
+function openDetail(key){
+  const p=PRODUCTS.find(x=>ik(x)===key);if(!p){toast('Not found','error');return;}
+  selectedProduct=p;selectedAddon=null;
+  document.getElementById('d-title').textContent=p.name;
+  document.getElementById('d-sub').textContent=p.category+(vl(p)?' — '+vl(p):'');
+  document.getElementById('d-cat').textContent=p.category;
+  document.getElementById('d-name').textContent=p.name;
+  document.getElementById('d-vdisplay').textContent=vl(p)||'No variant';
+  document.getElementById('d-srp').textContent='₱'+p.srp.toLocaleString();
+  document.getElementById('f-vro').value=vl(p)||'—';
+  document.getElementById('f-qty').value='1';
+  renderColorFields(1);
+  document.getElementById('f-soldtype').value='Walk-in';
+  document.getElementById('f-promoter').value='';
+  document.getElementById('f-pasa').value='';
+  document.getElementById('f-payment').value='Cash';
+  const fb=document.getElementById('f-bundle');
+  fb.value='';
+  fb.dataset.bundlePrice='';
+  fb.dataset.bundleName='';
+  fb.dataset.promoAddonKey='';
+  fb.dataset.promoAddonName='';
+  document.getElementById('promoterField').style.display='none';
+  document.getElementById('pasaField').style.display='none';
+  // Color datalist
+  const dl=document.getElementById('colorOptions');
+  dl.innerHTML=(COLORS[p.category]||[]).map(c=>'<option value="'+c+'">').join('');
+  // Freebie check
+  const freebieKey=productFreebies[ik(p)];
+  const freebieP=freebieKey?masterList.find(x=>ik(x)===freebieKey):null;
+  const freebieEl=document.getElementById('freebieSec');
+  if(freebieEl){freebieEl.style.display=freebieP?'flex':'none';}
+  const fnEl=document.getElementById('freebieItemName');
+  if(fnEl)fnEl.textContent=freebieP?freebieP.name+' ('+freebieP.category+')':'';
+  // Addon
+  const hasAddon=ADDON_CATS.includes(p.category);
+  // (hasAddon already declared above)
+  document.getElementById('addonSec').style.display=hasAddon?'block':'none';
+  document.getElementById('addonPicker').style.display='none';
+  document.getElementById('addonList').style.display='none';
+  document.getElementById('addonItems').innerHTML='';
+  document.getElementById('addonPickerBtn').style.display='';
+  addonCat='All';buildAddonCatFilter();
+  // Hide customer info if this is a subsequent item in an existing SO
+  const custSec=document.getElementById('custInfoSection');
+  if(custSec)custSec.style.display=saleRows.length>0?'none':'block';
+  recalc();showS('detail');
+}
+function onSoldTypeChange(){
+  const isPasa=document.getElementById('f-soldtype').value==='Pasa';
+  document.getElementById('promoterField').style.display=isPasa?'block':'none';
+  document.getElementById('pasaField').style.display=isPasa?'block':'none';
+  if(!isPasa)document.getElementById('f-pasa').value='';
+  recalc();
+}
+function renderColorFields(qty){
+  const cat=selectedProduct?selectedProduct.category:'';
+  const colorOpts=(COLORS[cat]||[]).map(c=>'<option value="'+c+'">').join('');
+  document.getElementById('colorOptions').innerHTML=colorOpts;
+  const container=document.getElementById('colorFields');
+  if(!container)return;
+  if(qty<=1){
+    container.innerHTML='<input type="text" class="cf-input" data-unit="0" placeholder="e.g. Midnight Black" list="colorOptions" style="width:100%;">';
+  } else {
+    let html='';
+    for(let i=0;i<qty;i++){
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
+        '<span style="font-size:12px;color:var(--muted);min-width:48px;">Unit '+(i+1)+'</span>'+
+        '<input type="text" class="cf-input" data-unit="'+i+'" placeholder="e.g. Midnight Black" list="colorOptions" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none;">'+
+        '</div>';
+    }
+    container.innerHTML=html;
+  }
+  // Focus first input
+  const first=container.querySelector('.cf-input');
+  if(first)setTimeout(()=>first.focus(),100);
+}
+function getColors(){
+  const inputs=document.querySelectorAll('#colorFields .cf-input');
+  if(!inputs.length)return [''];
+  return Array.from(inputs).map(i=>i.value.trim());
+}
+function allColorsEntered(){
+  return getColors().every(c=>c.length>0);
+}
+
+function recalc(){
+  if(!selectedProduct)return;
+  const srp=selectedProduct.srp,qty=parseInt(document.getElementById('f-qty').value)||1;
+  const isPasa=document.getElementById('f-soldtype').value==='Pasa';
+  const pasa=isPasa?(parseFloat(document.getElementById('f-pasa').value)||0):0;
+  // Customer-facing price: SRP + Pasa when Pasa, SRP otherwise
+  const displayPrice=isPasa?srp+pasa:srp;
+  const addonT=selectedAddon?selectedAddon.soldPrice:0;
+  const tot=displayPrice*qty+addonT;
+  // Update the hero strip SRP to show combined price
+  const srpEl=document.getElementById('d-srp');
+  if(srpEl&&!document.getElementById('f-bundle').dataset.bundlePrice){
+    srpEl.textContent=isPasa&&pasa>0?'₱'+(srp+pasa).toLocaleString():'₱'+srp.toLocaleString();
+  }
+  const lbl=document.getElementById('c-total-label');
+  if(lbl)lbl.textContent=isPasa&&pasa>0?'Customer Total (incl. Pasa)':'Total Amount';
+  document.getElementById('c-total').textContent=tot>0?'₱'+tot.toLocaleString():'—';
+}
+
+// ADDON PICKER
+function toggleAddonPicker(){const el=document.getElementById('addonPicker');el.style.display=el.style.display==='none'?'block':'none';if(el.style.display==='block'){buildAddonCatFilter();renderAddonGrid();}}
+function buildAddonCatFilter(){
+  const cats=['All','Earbuds','Smart Watch','Power Bank','Others'];
+  const el=document.getElementById('addonCatF');if(!el)return;
+  el.innerHTML=cats.map(c=>'<button class="cat-btn'+(c===addonCat?' active':'')+'" data-ac="'+encodeURIComponent(c)+'">'+c+'</button>').join('');
+  el.onclick=function(e){const b=e.target.closest('.cat-btn');if(!b)return;addonCat=decodeURIComponent(b.dataset.ac);el.querySelectorAll('.cat-btn').forEach(x=>x.classList.toggle('active',x===b));renderAddonGrid();};
+}
+function renderAddonGrid(){
+  const grid=document.getElementById('addonGrid');if(!grid)return;
+  const allowed=['Earbuds','Smart Watch','Power Bank','Others'];
+  const list=PRODUCTS.filter(p=>allowed.includes(p.category)&&(addonCat==='All'||p.category===addonCat));
+  const map={};
+  grid.innerHTML=list.map((p,i)=>{
+    const key=ik(p);map[i]=key;
+    const inv=inventory[key]||{stock:0,reorder:1};
+    const isOut=inv.stock<=0,isLow=!isOut&&inv.stock<=inv.reorder;
+    const isSel=selectedAddon&&ik(selectedAddon.product)===key;
+    let sc='sok',sl=inv.stock+' left';
+    if(isOut){sc='sout';sl='OUT';}else if(isLow){sc='slow';sl='LOW:'+inv.stock;}
+    return '<div class="pc'+(isOut?' oos':'')+(isSel?' sel':'')+'" data-ai="'+i+'" style="padding:10px;"><div class="sb '+sc+'">'+sl+'</div><div class="cl">'+p.category+'</div><div class="pn" style="font-size:12px;">'+p.name+'</div><div class="pp" style="font-size:13px;">₱'+p.srp.toLocaleString()+'</div>'+(isSel?'<div style="font-size:10px;color:var(--green);margin-top:4px;">✓ Added</div>':'')+'</div>';
+  }).join('')||'<div style="padding:20px;text-align:center;color:var(--muted);">No accessories.</div>';
+  grid.onclick=function(e){
+    const c=e.target.closest('.pc');if(!c||c.classList.contains('oos'))return;
+    const k=map[parseInt(c.dataset.ai)];const p=PRODUCTS.find(x=>ik(x)===k);if(!p)return;
+    selectedAddon={product:p,soldPrice:p.srp};
+    if(!document.getElementById('f-bundle').value){bundleCounter++;localStorage.setItem('kt_pc',bundleCounter);const d=new Date();const dp=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');document.getElementById('f-bundle').value='BDL-'+dp+'-'+String(bundleCounter).padStart(3,'0');}
+    // Promotions: hide add-on section, show freebie label
+    document.getElementById('addonPickerBtn').style.display='none';
+    renderAddonList();
+    recalc();
+  };
+}
+function renderAddonList(){
+  if(!selectedAddon){document.getElementById('addonList').style.display='none';return;}
+  document.getElementById('addonList').style.display='block';
+  const a=selectedAddon;
+  document.getElementById('addonItems').innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1.5px solid var(--accent);border-radius:8px;"><div><div style="font-size:13px;font-weight:600;color:var(--accent);">'+a.product.name+'</div><div style="font-size:11px;color:var(--muted);">Add-on price (editable)</div></div><div style="display:flex;align-items:center;gap:10px;"><span style="color:var(--muted);">₱</span><input type="number" value="'+a.soldPrice+'" min="0" oninput="selectedAddon.soldPrice=parseFloat(this.value)||0;recalc();" style="width:90px;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:monospace;font-weight:600;color:var(--accent);background:var(--bg);outline:none;"><span onclick="removeAddon()" style="cursor:pointer;color:var(--muted);font-size:18px;">✕</span></div></div>';
+}
+function removeAddon(){selectedAddon=null;document.getElementById('f-bundle').value='';document.getElementById('addonList').style.display='none';document.getElementById('addonPickerBtn').style.display='';renderAddonGrid();recalc();}
+
+// REVIEW & CONFIRM
+// ─────────────────────────────────────────────────────────────
+// FLOW:
+//   openDetail() → user fills form
+//   addAnotherItem() → stages item to pendingItems, back to picker
+//   goToReview() → stages current item + shows full review of ALL pendingItems
+//   confirmSale() → moves pendingItems → saleRows (day report)
+// ─────────────────────────────────────────────────────────────
+
+function buildPendingItem(){
+  // Read current Screen 2 form and return a pending item object (or null if invalid)
+  if(!selectedProduct)return null;
+  const colors=getColors(),color=colors.join(', ');
+  const soldType=document.getElementById('f-soldtype').value;
+  const promoter=document.getElementById('f-promoter').value.trim();
+  const bundlePrice=parseFloat(document.getElementById('f-bundle').dataset.bundlePrice||'0');
+  const qty=parseInt(document.getElementById('f-qty').value)||1;
+  const pasa=parseFloat(document.getElementById('f-pasa').value)||0;
+  const payment=document.getElementById('f-payment').value;
+  const bundleCode=document.getElementById('f-bundle').value;
+  const promoAddonKey=document.getElementById('f-bundle').dataset.promoAddonKey||'';
+  const promoAddonName=document.getElementById('f-bundle').dataset.promoAddonName||'';
+  const bundleName=document.getElementById('f-bundle').dataset.bundleName||'';
+
+  if(!allColorsEntered()){toast('Please enter a color for each unit','error');return null;}
+  if(soldType==='Pasa'&&!promoter){toast('Please enter promoter name','error');return null;}
+  if(soldType==='Pasa'&&!pasa){toast('Please enter a Pasa price','error');return null;}
+
+  const p=selectedProduct;
+  const srp=p.srp;
+  const isPromo=bundlePrice>0;
+  const sp=isPromo?bundlePrice:(soldType==='Pasa'?srp+pasa:srp);
+  const freebieKey=productFreebies[ik(p)];
+  const freebieP=freebieKey?masterList.find(x=>ik(x)===freebieKey):null;
+
+  const item={
+    id:Date.now()+Math.random(),
+    isPromo,
+    bundleCode,
+    bundleName,
+    product:p,
+    colors,
+    color,
+    qty,
+    soldType,
+    promoter:soldType==='Pasa'?promoter:'',
+    pasa:pasa||0,
+    payment,
+    srp,
+    sp,
+    unitPrice:p.unitPrice,
+    net:(sp-p.unitPrice)*qty,
+    addon:selectedAddon?{...selectedAddon}:null,
+    freebie:freebieP?{name:freebieP.name,key:freebieKey}:null,
+    promoAddon:promoAddonKey?{key:promoAddonKey,name:promoAddonName}:null,
+    customer:pendingItems.length===0?getCustomerInfo():null,
+  };
+  return item;
+}
+
+function addAnotherItem(){
+  const item=buildPendingItem();
+  if(!item)return;
+  pendingItems.push(item);
+  toast('✅ '+item.product.name+' added — select next item','success');
+  // Reset detail screen and go back to picker
+  selectedProduct=null;selectedAddon=null;
+  showS('picker');
+}
+
+function goToReview(){
+  // Stage current item if form is filled
+  if(selectedProduct){
+    const item=buildPendingItem();
+    if(!item)return;
+    pendingItems.push(item);
+    selectedProduct=null;selectedAddon=null;
+  }
+  if(!pendingItems.length){toast('No items to review','error');return;}
+
+  // Generate SO now if not exists
+  if(!currentSO){
+    soCounter++;localStorage.setItem('kt_so',soCounter);
+    const d=new Date();
+    currentSO='SO-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(soCounter).padStart(4,'0');
+  }
+
+  renderReview();
+  showS('review');
+}
+
+function renderReview(){
+  // Grand total across all pending items
+  const grandTotal=pendingItems.reduce((s,item)=>{
+    const addonT=item.addon?item.addon.soldPrice:0;
+    return s+item.sp*item.qty+addonT;
+  },0);
+
+  // Customer info from first item
+  const custInfo=pendingItems.find(i=>i.customer)?.customer||null;
+
+  let html='';
+
+  // ── SO + Payment header ──
+  html+='<div style="background:var(--accent);border-radius:12px;padding:16px 20px;margin-bottom:14px;color:#fff;">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+  html+='<div><div style="font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:1px;">Sales Order</div><div style="font-size:18px;font-weight:800;font-family:monospace;">'+currentSO+'</div></div>';
+  // Payment and sold type from first item (consistent across SO)
+  const firstItem=pendingItems[0];
+  html+='<div style="text-align:right;"><div class="review-chip" style="background:rgba(255,255,255,.2);">'+firstItem.payment+'</div><div class="review-chip" style="background:rgba(255,255,255,.2);margin-top:4px;">'+firstItem.soldType+(firstItem.promoter?' — '+firstItem.promoter:'')+'</div></div>';
+  html+='</div>';
+  if(custInfo){
+    html+='<div style="border-top:1px solid rgba(255,255,255,.2);padding-top:8px;margin-top:4px;font-size:12px;opacity:.85;">';
+    if(custInfo.name)html+='👤 '+custInfo.name+'&nbsp;&nbsp;';
+    if(custInfo.contact)html+='📞 '+custInfo.contact+'&nbsp;&nbsp;';
+    if(custInfo.email)html+='✉️ '+custInfo.email;
+    html+='</div>';
+  }
+  html+='</div>';
+
+  // ── Item cards ──
+  pendingItems.forEach((item,idx)=>{
+    const addonT=item.addon?item.addon.soldPrice:0;
+    const itemTotal=item.sp*item.qty+addonT;
+    html+='<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;">';
+    // Item header
+    html+='<div style="background:var(--accent-light);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">';
+    html+='<div style="display:flex;align-items:center;gap:10px;">';
+    html+='<div style="background:var(--accent);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">'+(idx+1)+'</div>';
+    html+='<div><div style="font-weight:700;font-size:14px;">'+item.product.name+'</div>';
+    html+='<div style="font-size:11px;color:var(--muted);">'+item.product.category+(vl(item.product)?' — '+vl(item.product):'')+'</div></div></div>';
+    html+='<div style="display:flex;gap:6px;"><button class="btn btn-outline btn-sm" onclick="editPendingItem('+idx+')" style="padding:4px 10px;font-size:11px;">✏️</button><button class="btn btn-ghost btn-sm" onclick="removePendingItem('+idx+')" style="padding:4px 8px;font-size:13px;color:var(--red);">✕</button></div>';
+    html+='</div>';
+    // Item details
+    html+='<div style="padding:12px 16px;">';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">';
+    html+='<div><div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Color(s)</div><div style="font-size:13px;font-weight:600;">'+item.colors.filter(Boolean).join(', ')+'</div></div>';
+    html+='<div><div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Qty</div><div style="font-size:13px;font-weight:600;">'+item.qty+'</div></div>';
+    html+='<div><div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Price</div><div style="font-size:13px;font-weight:700;color:var(--accent);font-family:monospace;">'+fmt(item.sp)+'</div></div>';
+    html+='</div>';
+    // Bundle code
+    if(item.bundleCode)html+='<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">'+((item.isPromo)?'Promo':'Bundle')+' Code: <span style="font-family:monospace;font-weight:600;color:var(--accent);">'+item.bundleCode+'</span></div>';
+    // Add-on
+    if(item.addon){html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--accent-light);border-radius:8px;margin-bottom:8px;"><span>➕</span><div style="flex:1;font-size:13px;font-weight:600;">'+item.addon.product.name+'</div><div style="font-size:13px;font-weight:700;color:var(--accent);font-family:monospace;">₱'+item.addon.soldPrice.toLocaleString()+'</div></div>';}
+    // Freebie
+    if(item.freebie||item.promoAddon){const fn=(item.freebie||item.promoAddon).name;html+='<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f0fdf4;border-radius:8px;margin-bottom:8px;"><span>🎁</span><div style="flex:1;font-size:13px;font-weight:600;color:#15803d;">'+fn+'</div><div style="font-size:11px;font-weight:700;color:#15803d;background:#dcfce7;padding:2px 8px;border-radius:10px;">FREE</div></div>';}
+    // Item subtotal
+    html+='<div style="display:flex;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--border);"><span style="font-size:13px;color:var(--muted);margin-right:10px;">Subtotal</span><span class="mono" style="font-size:15px;font-weight:700;color:var(--accent);">'+fmt(itemTotal)+'</span></div>';
+    html+='</div></div>';
+  });
+
+  // ── Grand total ──
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--accent);border-radius:10px;color:#fff;">';
+  html+='<div><div style="font-size:11px;opacity:.8;">'+(pendingItems.length)+' item'+(pendingItems.length!==1?'s':'')+'</div><div style="font-size:13px;font-weight:600;">Total Amount</div></div>';
+  html+='<div class="mono" style="font-size:28px;font-weight:800;">'+fmt(grandTotal)+'</div>';
+  html+='</div>';
+
+  document.getElementById('reviewContent').innerHTML=html;
+  // Update confirm button label
+  const confirmBtn=document.getElementById('confirmSaleBtn');
+  if(confirmBtn)confirmBtn.textContent='✓ Customer Approved — Confirm '+pendingItems.length+' Item'+(pendingItems.length!==1?'s':'');
+}
+
+function removePendingItem(idx){
+  pendingItems.splice(idx,1);
+  if(!pendingItems.length){showS('picker');return;}
+  renderReview();
+}
+
+function editPendingItem(idx){
+  // Remove from pending, reopen detail screen for that item
+  const item=pendingItems.splice(idx,1)[0];
+  selectedProduct=item.product;
+  selectedAddon=item.addon;
+  showS('detail');
+  setTimeout(()=>{
+    openDetail(ik(item.product));
+    setTimeout(()=>{
+      document.getElementById('f-soldtype').value=item.soldType;
+      document.getElementById('f-payment').value=item.payment;
+      document.getElementById('f-qty').value=item.qty;
+      document.getElementById('f-pasa').value=item.pasa||'';
+      document.getElementById('f-promoter').value=item.promoter||'';
+      document.getElementById('f-bundle').value=item.bundleCode||'';
+      if(item.bundleCode)document.getElementById('f-bundle').dataset.bundlePrice=item.isPromo?item.sp:'';
+      renderColorFields(item.qty);
+      setTimeout(()=>{
+        const inputs=document.querySelectorAll('#colorFields .cf-input');
+        inputs.forEach((el,i)=>{if(item.colors[i])el.value=item.colors[i];});
+        if(item.addon)selectedAddon=item.addon;
+        if(item.soldType==='Pasa'){document.getElementById('promoterField').style.display='block';document.getElementById('pasaField').style.display='block';}
+        renderAddonList();recalc();
+      },80);
+    },80);
+  },50);
+}
+
+function getOrCreateSO(){
+  if(!currentSO){
+    soCounter++;localStorage.setItem('kt_so',soCounter);
+    const d=new Date();
+    currentSO='SO-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+String(soCounter).padStart(4,'0');
+  }
+  document.getElementById('soLabel').textContent=currentSO;
+  document.getElementById('soBanner').style.display='flex';
+  return currentSO;
+}
+
+function clearSO(){
+  if((saleRows.length||pendingItems.length)&&!confirm('Start new Sales Order? Pending items will be discarded.'))return;
+  currentSO=null;pendingItems=[];
+  document.getElementById('soBanner').style.display='none';
+  toast('Ready for new Sales Order','success');
+}
+
+function updateSOBanner(){
+  if(!currentSO)return;
+  document.getElementById('soBanner').style.display='flex';
+  document.getElementById('soLabel').textContent=currentSO;
+  document.getElementById('floatBtn').style.display='block';
+  document.getElementById('floatCount').textContent=saleRows.length+' item'+(saleRows.length!==1?'s':'')+' in report';
+}
+
+function confirmSale(){
+  if(!pendingItems.length){toast('No items to confirm','error');return;}
+  const so=getOrCreateSO();
+  const now=Date.now();
+
+  pendingItems.forEach((item,i)=>{
+    const p=item.product;
+    const freebieKey=item.freebie?item.freebie.key:null;
+
+    // Main item row
+    const row={
+      id:now+i*10,so,
+      bundle:item.bundleCode||'',
+      itemName:p.name,variant:vl(p),color:item.color,
+      qty:item.qty,unitPrice:item.unitPrice,srp:item.srp,
+      soldPrice:item.sp,pasaPrice:item.pasa||0,discount:0,
+      netSales:(item.sp-item.unitPrice)*item.qty,
+      payment:item.payment,soldType:item.soldType,
+      promoter:item.promoter,staff:currentUser,
+      productKey:ik(p),isPromotion:item.isPromo||false,
+      customer:item.customer||null,
+    };
+    saleRows.push(row);
+    if(inventory[ik(p)])inventory[ik(p)].stock=Math.max(0,inventory[ik(p)].stock-item.qty);
+
+    // Add-on row
+    if(item.addon){
+      const a=item.addon,ak=ik(a.product);
+      saleRows.push({id:now+i*10+1,so,bundle:item.bundleCode||'',itemName:a.product.name,variant:vl(a.product),color:'',qty:1,unitPrice:a.product.unitPrice,srp:a.product.srp,soldPrice:a.soldPrice,pasaPrice:0,discount:0,netSales:a.soldPrice-a.product.unitPrice,payment:item.payment,soldType:item.soldType,promoter:item.promoter,staff:currentUser,productKey:ak,isAddon:true,customer:null});
+      if(inventory[ak])inventory[ak].stock=Math.max(0,inventory[ak].stock-1);
+    }
+
+    // Promotion included accessory row
+    if(item.promoAddon){
+      const paKey=item.promoAddon.key;
+      const paP=masterList.find(x=>ik(x)===paKey);
+      if(paP){saleRows.push({id:now+i*10+2,so,bundle:item.bundleCode||'',itemName:paP.name,variant:vl(paP),color:'Assorted',qty:item.qty,unitPrice:paP.unitPrice,srp:0,soldPrice:0,pasaPrice:0,discount:0,netSales:-(paP.unitPrice*item.qty),payment:item.payment,soldType:item.soldType,promoter:'',staff:currentUser,productKey:paKey,isPromoAddon:true,customer:null});if(inventory[paKey])inventory[paKey].stock=Math.max(0,inventory[paKey].stock-item.qty);}
+    }
+
+    // Freebie (product-level freebie)
+    if(freebieKey&&inventory[freebieKey])inventory[freebieKey].stock=Math.max(0,inventory[freebieKey].stock-item.qty);
+  });
+
+  saveInv();
+  pendingItems=[];
+  resetCustomerInfo();
+  // Clear SO after confirm so next sale starts a new SO
+  currentSO=null;
+  document.getElementById('soBanner').style.display='none';
+  document.getElementById('floatBtn').style.display='none';
+  toast('✅ Sales Order '+so+' confirmed!','success');
+  showS('picker');
+  renderSalesTable();renderSummary();
+}
+
+// REPORT TABLE
+function renderSalesTable(){
+  const body=document.getElementById('salesBody'),foot=document.getElementById('salesFoot'),sum=document.getElementById('summarySection');
+  if(!saleRows.length){body.innerHTML='<tr><td colspan="13" style="text-align:center;color:var(--muted);padding:28px;">No transactions yet.</td></tr>';foot.style.display='none';sum.style.display='none';return;}
+  let tS=0,tP=0,tD=0,tN=0;
+  body.innerHTML=saleRows.map(r=>{
+    tS+=r.soldPrice*r.qty;tP+=r.pasaPrice||0;tD+=r.discount||0;tN+=r.netSales||0;
+    const tc=r.soldType==='Pasa'?'<span style="color:var(--accent2);font-weight:600;">Pasa</span>'+(r.promoter?'<br><span style="font-size:10px;color:var(--muted);">'+r.promoter+'</span>':''):'<span style="color:var(--green);font-weight:600;">Walk-in</span>';
+    const rowCode=r.bundle||'';
+    const codeStyle=r.isPromotion?'color:#15803d;':'color:var(--accent2);';
+    return '<tr><td style="font-size:11px;" class="mono">'+(r.so||'—')+'</td>'+
+      '<td style="font-size:11px;font-family:monospace;font-weight:600;'+codeStyle+'">'+(rowCode||'—')+'</td>'+
+      '<td style="font-weight:600;">'+r.itemName+(r.isAddon?' <span style="font-size:10px;background:var(--accent-light);color:var(--accent);padding:1px 5px;border-radius:4px;">add-on</span>':'')+'</td><td style="color:var(--muted);font-size:12px;">'+(r.variant||'—')+'</td><td>'+(r.color||'—')+'</td><td class="mono">'+r.qty+'</td><td class="mono">₱'+r.srp.toLocaleString()+'</td><td class="mono" style="font-weight:700;color:var(--accent);">₱'+(r.soldPrice*r.qty).toLocaleString()+'</td><td class="mono">'+(r.pasaPrice>0?'₱'+r.pasaPrice.toLocaleString():'N/A')+'</td><td class="mono" style="color:var(--red);">'+(r.discount>0?'₱'+r.discount.toLocaleString():'N/A')+'</td><td class="mono" style="color:var(--green);">₱'+(r.netSales||0).toLocaleString()+'</td><td>'+r.payment+'</td><td>'+tc+'</td><td><span onclick="removeRow('+r.id+')" style="cursor:pointer;color:var(--muted);font-size:16px;">✕</span></td></tr>';
+  }).join('');
+  document.getElementById('tot-sold').textContent=fmt(tS);
+  document.getElementById('tot-pasa').textContent=tP>0?fmt(tP):'N/A';
+  document.getElementById('tot-disc').textContent=tD>0?fmt(tD):'N/A';
+  document.getElementById('tot-net').textContent=fmt(tN);
+  foot.style.display='';sum.style.display='block';
+}
+function removeRow(id){const r=saleRows.find(x=>x.id===id);if(r&&inventory[r.productKey])inventory[r.productKey].stock+=r.qty;saleRows=saleRows.filter(x=>x.id!==id);saveInv();renderSalesTable();renderSummary();}
+function renderSummary(){
+  if(!saleRows.length)return;
+  const gross=saleRows.reduce((s,r)=>s+r.soldPrice*r.qty,0),disc=saleRows.reduce((s,r)=>s+(r.discount||0),0),net=saleRows.reduce((s,r)=>s+(r.netSales||0),0),cash=saleRows.filter(r=>r.payment==='Cash').reduce((s,r)=>s+r.soldPrice*r.qty,0),card=saleRows.filter(r=>r.payment==='Card').reduce((s,r)=>s+r.soldPrice*r.qty,0),hc=saleRows.filter(r=>r.payment==='Home Credit').reduce((s,r)=>s+r.soldPrice*r.qty,0);
+  document.getElementById('s-gross').textContent=fmt(gross);document.getElementById('s-disc').textContent=disc>0?fmt(disc):'N/A';document.getElementById('s-net').textContent=fmt(net);document.getElementById('s-cash').textContent=cash>0?fmt(cash):'N/A';document.getElementById('s-card').textContent=card>0?fmt(card):'N/A';document.getElementById('s-hc').textContent=hc>0?fmt(hc):'N/A';
+  const sm={};saleRows.forEach(r=>{sm[r.staff]=(sm[r.staff]||0)+(r.netSales||0);});
+  let sh='',st=0;Object.entries(sm).forEach(([n,v])=>{st+=v;sh+='<div style="display:flex;justify-content:space-between;"><span>'+n+':</span><span class="mono" style="font-weight:700;">'+fmt(v)+'</span></div>';});
+  sh+='<div style="border-top:1px solid var(--border);margin:8px 0;"></div><div style="display:flex;justify-content:space-between;"><span>TOTAL:</span><span class="mono" style="font-weight:700;color:var(--accent);">'+fmt(st)+'</span></div>';
+  document.getElementById('s-staff').innerHTML=sh;
+  const met=net>=DAILY_TARGET(),gap=DAILY_TARGET()-net;
+  document.getElementById('s-result').innerHTML=met?'<span style="color:var(--green);">✅ Target Met!</span>':'<span style="color:var(--red);">❌ Below Target</span><div style="font-size:13px;color:var(--muted);font-weight:400;margin-top:4px;">'+fmt(gap)+' to go</div>';
+  const bt=(met?'✅ ':'')+fmt(net)+' / ₱'+settings.dailyTarget.toLocaleString()+'',bb=met?'#dcfce7':'#fee2e2',bc=met?'#16a34a':'#dc2626';
+  ['targetBadge','targetBadge2'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=bt;el.style.background=bb;el.style.color=bc;}});
+}
+async function submitDayReport(){
+  if(!saleRows.length){toast('No transactions to submit','error');return;}
+  if(scriptUrl){
+    try{
+      const res=await fetch(scriptUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logSale',date:new Date().toISOString(),rows:saleRows})});
+      const data=await res.json();
+      console.log('logSale:',data);
+      toast('Submitted to Google Sheets!','success');
+    }catch(e){console.warn('Sheet error:',e.message);toast('Submitted locally (Sheet sync: check CORS settings)','success');}
+  } else { toast('No sheet connected — data saved locally','success'); }
+  const low=[];PRODUCTS.forEach(p=>{const k=ik(p);const inv=inventory[k];if(inv&&inv.stock<=inv.reorder)low.push({name:p.name+(vl(p)?' '+vl(p):''),qty:5});});
+  if(low.length)generatePO(low);
+  saleRows=[];pendingItems=[];currentSO=null;document.getElementById('soBanner').style.display='none';renderSalesTable();renderSummary();renderInv();showS('picker');
+}
+function printReport(){
+  const date=new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+  const gross=saleRows.reduce((s,r)=>s+r.soldPrice*r.qty,0),disc=saleRows.reduce((s,r)=>s+(r.discount||0),0),net=saleRows.reduce((s,r)=>s+(r.netSales||0),0),cash=saleRows.filter(r=>r.payment==='Cash').reduce((s,r)=>s+r.soldPrice*r.qty,0),card=saleRows.filter(r=>r.payment==='Card').reduce((s,r)=>s+r.soldPrice*r.qty,0),hc=saleRows.filter(r=>r.payment==='Home Credit').reduce((s,r)=>s+r.soldPrice*r.qty,0),met=net>=DAILY_TARGET();
+  const sm={};saleRows.forEach(r=>{sm[r.staff]=(sm[r.staff]||0)+(r.netSales||0);});
+  const win=window.open('','_blank');
+  win.document.write('<!DOCTYPE html><html><head><title>Daily Sales Report</title><style>body{font-family:Arial,sans-serif;padding:32px;font-size:12px;}h1{font-size:15px;margin-bottom:2px;}.sub{color:#666;font-size:11px;margin-bottom:16px;}table{width:100%;border-collapse:collapse;margin:16px 0;}th{background:#1b2e6b;color:#fff;padding:8px;text-align:left;font-size:10px;}td{padding:7px 8px;border-bottom:1px solid #eee;font-size:11px;}.tf td{background:#e8ecf4;font-weight:700;}.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;}.box{border:1px solid #d0d7e8;border-radius:6px;padding:12px;}.box h3{font-size:12px;font-weight:700;margin-bottom:8px;color:#1b2e6b;}.row{display:flex;justify-content:space-between;margin-bottom:4px;}.sig{margin-top:40px;}@media print{body{padding:16px;}}</style></head><body>');
+  win.document.write('<h1>KHONSU ELECTRONIC GADGETS TRADING (ITEL MOBILE)</h1><div class="sub">Space No. K424.6 Festival Mall, FCC, Alabang, Muntinlupa City</div><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><div></div><div style="text-align:right;"><strong style="font-size:14px;">DAILY SALES REPORT</strong><br><span style="color:#666;">'+date+'</span></div></div>');
+  win.document.write('<table><thead><tr><th>SO#</th><th>Code</th><th>Item</th><th>Variant</th><th>Color</th><th>Qty</th><th>SRP</th><th>Sold Price</th><th>Pasa</th><th>Discount</th><th>Net Sales</th><th>Payment</th><th>Walk-in</th><th>Pasa</th><th>Staff</th></tr></thead><tbody>');
+  saleRows.forEach(r=>{win.document.write('<tr><td>'+(r.so||'—')+'</td><td>'+(r.bundle||'—')+'</td><td>'+r.itemName+'</td><td>'+(r.variant||'')+'</td><td>'+(r.color||'')+'</td><td>'+r.qty+'</td><td>P '+r.srp.toLocaleString()+'</td><td>P '+(r.soldPrice*r.qty).toLocaleString()+'</td><td>'+(r.pasaPrice>0?'P '+r.pasaPrice.toLocaleString():'N/A')+'</td><td>'+(r.discount>0?'P '+r.discount.toLocaleString():'N/A')+'</td><td>P '+(r.netSales||0).toLocaleString()+'</td><td>'+r.payment+'</td><td style="text-align:center;">'+(r.soldType==='Walk-in'?'✓':'')+'</td><td style="text-align:center;">'+(r.soldType==='Pasa'?'✓ '+(r.promoter||''):'')+'</td><td>'+r.staff+'</td></tr>');});
+  win.document.write('</tbody><tfoot><tr class="tf"><td colspan="7">TOTAL</td><td>P '+gross.toLocaleString('en-PH',{minimumFractionDigits:2})+'</td><td></td><td>'+(disc>0?'P '+disc.toLocaleString('en-PH',{minimumFractionDigits:2}):'N/A')+'</td><td>P '+net.toLocaleString('en-PH',{minimumFractionDigits:2})+'</td><td colspan="4"></td></tr></tfoot></table>');
+  win.document.write('<div class="grid"><div class="box"><h3>SALES SUMMARY</h3><div class="row"><span>Gross:</span><span>P '+gross.toLocaleString('en-PH',{minimumFractionDigits:2})+'</span></div><div class="row"><span>Discounts:</span><span>'+(disc>0?'P '+disc.toLocaleString('en-PH',{minimumFractionDigits:2}):'N/A')+'</span></div><div class="row"><span>Net Sales:</span><span><strong>P '+net.toLocaleString('en-PH',{minimumFractionDigits:2})+'</strong></span></div><hr style="margin:8px 0;"><div class="row"><span>Cash:</span><span>'+(cash>0?'P '+cash.toLocaleString('en-PH',{minimumFractionDigits:2}):'N/A')+'</span></div><div class="row"><span>Card:</span><span>'+(card>0?'P '+card.toLocaleString('en-PH',{minimumFractionDigits:2}):'N/A')+'</span></div><div class="row"><span>Home Credit:</span><span>'+(hc>0?'P '+hc.toLocaleString('en-PH',{minimumFractionDigits:2}):'N/A')+'</span></div></div>');
+  win.document.write('<div class="box"><h3>STAFF\u2019S SALES</h3>'+Object.entries(sm).map(([n,v])=>'<div class="row"><span>'+n+':</span><span>P '+v.toLocaleString('en-PH',{minimumFractionDigits:2})+'</span></div>').join('')+'<hr style="margin:8px 0;"><div class="row"><strong>DAILY TARGET: '+settings.dailyTarget.toLocaleString()+'.00 Php</strong></div></div>');
+  win.document.write('<div class="box"><h3>RESULT</h3><div style="font-size:14px;font-weight:700;">'+(met?'☑ Met':'☒ Below Target')+'</div></div></div>');
+  win.document.write('<div class="sig"><p><strong>PREPARED BY:</strong></p><p style="margin-top:16px;">Name: ________________________________&nbsp;&nbsp;&nbsp;Date: '+date+'</p><p style="margin-top:12px;">Signature: ________________________________</p></div>');
+  win.document.write('<scr'+'ipt>window.onload=()=>window.print();<\/scr'+'ipt></body></html>');
+  win.document.close();
+}
+
+// INVENTORY
+function renderInv(){
+  const body=document.getElementById('invBody');let out=0,low=0,ok=0;
+  body.innerHTML=masterList.map(p=>{
+    const key=ik(p),inv=inventory[key]||{stock:0,reorder:1},isOut=inv.stock<=0,isLow=!isOut&&inv.stock<=inv.reorder;
+    if(isOut)out++;else if(isLow)low++;else ok++;
+    const badge=isOut?'<span class="sb sout" style="position:static;display:inline-flex;">OUT</span>':isLow?'<span class="sb slow" style="position:static;display:inline-flex;">LOW</span>':'<span class="sb sok" style="position:static;display:inline-flex;">OK</span>';
+    const obs=p.obsolete?'<span style="font-size:10px;background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:4px;margin-left:6px;">Obsolete</span>':'';
+    return '<tr><td>'+p.category+'</td><td style="font-weight:600;">'+p.name+obs+'</td><td style="color:var(--muted);">'+(vl(p)||'—')+'</td><td style="font-size:12px;color:var(--muted);">'+(p.colors||'—')+'</td><td class="mono">₱'+(p.srp||0).toLocaleString()+'</td><td class="mono" style="font-weight:700;">'+inv.stock+'</td><td>'+badge+'</td></tr>';
+  }).join('');
+  document.getElementById('iv-tot').textContent=masterList.length;document.getElementById('iv-out').textContent=out;document.getElementById('iv-low').textContent=low;document.getElementById('iv-ok').textContent=ok;
+}
+
+// PO
+function generatePO(items){
+  let po=purchaseOrders.find(p=>p.status==='pending');
+  if(po){items.forEach(ni=>{const ex=po.items.find(i=>i.name===ni.name);if(ex)ex.qty+=ni.qty;else po.items.push(ni);});po.date=new Date().toLocaleString('en-PH');}
+  else{po={id:'PO-'+Date.now().toString().slice(-6),date:new Date().toLocaleString('en-PH'),supplier:'Tecnix Trading',approver:'Admin',items,status:'pending'};purchaseOrders.unshift(po);}
+  localStorage.setItem('kt_pos',JSON.stringify(purchaseOrders));
+  if(scriptUrl)fetch(scriptUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logPO',...po})}).catch(()=>{});
+  renderPOs();
+}
+function renderPOs(){
+  const el=document.getElementById('poList');
+  if(!purchaseOrders.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);">No purchase orders yet.</div>';return;}
+  el.innerHTML=purchaseOrders.map(po=>`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+        <div>
+          <div style="font-size:16px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent);margin-bottom:6px;">${po.id}</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.9;"><strong style="color:var(--text);">Date:</strong> ${po.date}<br><strong style="color:var(--text);">Supplier:</strong> ${po.supplier}<br><strong style="color:var(--text);">Approver:</strong> ${po.approver}</div>
+        </div>
+        <span class="badge ${po.status==='sent'?'bg':'by'}">${po.status==='sent'?'✓ Sent':'⏳ Pending'}</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+        <thead><tr><th style="background:var(--accent);color:#fff;padding:8px;font-size:10px;text-align:left;">Item</th><th style="background:var(--accent);color:#fff;padding:8px;font-size:10px;">Color/Notes</th><th style="background:var(--accent);color:#fff;padding:8px;font-size:10px;text-align:right;">Qty</th></tr></thead>
+        <tbody>${po.items.map(i=>`<tr><td style="padding:8px;border-bottom:1px solid var(--border);font-size:13px;">${i.name}</td><td style="padding:8px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);">${i.color||'—'}</td><td style="padding:8px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;text-align:right;font-family:monospace;">${i.qty}</td></tr>`).join('')}</tbody>
+      </table>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        ${po.status==='pending'?`<button class="btn btn-outline btn-sm" onclick="openPOEdit('${po.id}')">✏️ Edit</button><button class="btn btn-success btn-sm" onclick="markSent('${po.id}')">✓ Mark as Sent</button>`:''}
+        <button class="btn btn-outline btn-sm" onclick="printPO('${po.id}')">🖨 Print</button>
+      </div>
+    </div>`).join('');
+}
+function markSent(id){const po=purchaseOrders.find(p=>p.id===id);if(po){po.status='sent';localStorage.setItem('kt_pos',JSON.stringify(purchaseOrders));renderPOs();toast('PO marked as sent','success');}}
+
+let editingPOId=null;
+function openPOEdit(id){
+  const po=purchaseOrders.find(p=>p.id===id);if(!po)return;
+  editingPOId=id;
+  document.getElementById('poEditId').textContent=id;
+  // Populate datalist with master list product names
+  const dl=document.getElementById('poItemList');
+  dl.innerHTML=masterList.filter(p=>!p.obsolete).map(p=>'<option value="'+p.name+(vl(p)?' ('+vl(p)+')':'')+'">').join('');
+  renderPOEditItems(po);
+  document.getElementById('po-new-item').value='';
+  document.getElementById('po-new-qty').value='1';
+  document.getElementById('po-new-color').value='';
+  document.getElementById('poEditModal').style.display='flex';
+}
+function closePOEdit(){document.getElementById('poEditModal').style.display='none';editingPOId=null;}
+function renderPOEditItems(po){
+  document.getElementById('poEditItems').innerHTML='<div style="margin-bottom:12px;">'+po.items.map((item,i)=>`
+    <div style="display:grid;grid-template-columns:2fr 80px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:600;">${item.name}</div>
+      <input type="number" value="${item.qty}" min="1" oninput="updatePOItem(${i},'qty',this.value)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+      <input type="text" value="${item.color||'Assorted'}" oninput="updatePOItem(${i},'color',this.value)" placeholder="Color/Notes" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;">
+      <span onclick="removePOItem(${i})" style="cursor:pointer;color:var(--muted);font-size:16px;padding:4px;">✕</span>
+    </div>`).join('')+'</div>';
+}
+function updatePOItem(i,field,val){
+  const po=purchaseOrders.find(p=>p.id===editingPOId);if(!po)return;
+  if(field==='qty')po.items[i].qty=parseInt(val)||1;
+  if(field==='color')po.items[i].color=val;
+}
+function removePOItem(i){
+  const po=purchaseOrders.find(p=>p.id===editingPOId);if(!po)return;
+  po.items.splice(i,1);renderPOEditItems(po);
+}
+function addPOLineItem(){
+  const name=document.getElementById('po-new-item').value.trim();
+  const qty=parseInt(document.getElementById('po-new-qty').value)||1;
+  const color=document.getElementById('po-new-color').value.trim()||'Assorted';
+  if(!name){toast('Enter item name','error');return;}
+  const po=purchaseOrders.find(p=>p.id===editingPOId);if(!po)return;
+  po.items.push({name,qty,color});
+  renderPOEditItems(po);
+  document.getElementById('po-new-item').value='';
+  document.getElementById('po-new-qty').value='1';
+  document.getElementById('po-new-color').value='';
+  toast('Line item added','success');
+}
+function savePOEdit(){
+  localStorage.setItem('kt_pos',JSON.stringify(purchaseOrders));
+  if(scriptUrl){fetch(scriptUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'logPO',...purchaseOrders.find(p=>p.id===editingPOId)})}).catch(()=>{});}
+  closePOEdit();renderPOs();toast('PO updated!','success');
+}
+function printPO(id){
+  const po=purchaseOrders.find(p=>p.id===id);if(!po)return;
+  const win=window.open('','_blank');
+  const poDate=po.date;
+  const statusColor=po.status==='sent'?'#16a34a':'#d97706';
+  const statusBg=po.status==='sent'?'#dcfce7':'#fef3c7';
+  win.document.write('<!DOCTYPE html><html><head><title>'+po.id+'</title><style>'+
+    'body{font-family:Arial,sans-serif;padding:32px;font-size:12px;color:#111;}'+
+    '.sub{color:#666;font-size:11px;margin-bottom:0;}'+
+    'h1{font-size:15px;margin-bottom:2px;}'+
+    'table{width:100%;border-collapse:collapse;margin:16px 0;}'+
+    'th{background:#1b2e6b;color:#fff;padding:8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}'+
+    'td{padding:8px;border-bottom:1px solid #eee;font-size:12px;}'+
+    '.meta{margin:12px 0;padding:12px;background:#f0f2f7;border-radius:6px;font-size:12px;line-height:2;}'+
+    '.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:'+statusBg+';color:'+statusColor+';}'+
+    '.sig{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:40px;}'+
+    '.sig-line{border-top:1px solid #000;padding-top:4px;color:#666;font-size:11px;margin-top:30px;}'+
+    '.footer{margin-top:20px;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px;}'+
+    '@media print{body{padding:16px;}}'+
+  '</style></head><body>');
+  win.document.write('<h1>KHONSU ELECTRONIC GADGETS TRADING (ITEL MOBILE)</h1>');
+  win.document.write('<div class="sub">Space No. K424.6 Festival Mall, FCC, Alabang, Muntinlupa City</div>');
+  win.document.write('<div style="display:flex;justify-content:space-between;align-items:flex-start;margin:16px 0 0;">');
+  win.document.write('<div></div>');
+  win.document.write('<div style="text-align:right;"><strong style="font-size:14px;">PURCHASE ORDER</strong><br><span style="color:#666;font-size:12px;">'+poDate+'</span></div>');
+  win.document.write('</div>');
+  win.document.write('<div class="meta">');
+  win.document.write('<strong>PO Number:</strong> '+po.id+' &nbsp; <span class="badge">'+po.status.toUpperCase()+'</span><br>');
+  win.document.write('<strong>Supplier:</strong> '+po.supplier+'<br>');
+  win.document.write('<strong>Approver:</strong> '+po.approver);
+  win.document.write('</div>');
+  win.document.write('<table><thead><tr><th>Item</th><th>Color / Notes</th><th style="text-align:right;">Qty</th></tr></thead><tbody>');
+  po.items.forEach(i=>{
+    win.document.write('<tr><td>'+i.name+'</td><td style="color:#666;">'+(i.color||'Assorted')+'</td><td style="text-align:right;font-weight:600;font-family:monospace;">'+i.qty+'</td></tr>');
+  });
+  win.document.write('</tbody></table>');
+  win.document.write('<div style="padding:10px 12px;background:#f0f2f7;border-radius:6px;display:flex;justify-content:space-between;margin-top:8px;"><span>Total Line Items</span><strong>'+po.items.length+'</strong></div>');
+  win.document.write('<div class="sig">');
+  win.document.write('<div><div class="sig-line">Prepared by — Signature / Date</div></div>');
+  win.document.write('<div><div class="sig-line">Received by — Signature / Date</div></div>');
+  win.document.write('</div>');
+  win.document.write('<div class="footer">Generated by Khonsu Tech OPS</div>');
+  win.document.write('<scr'+'ipt>window.onload=()=>window.print();<\/scr'+'ipt></body></html>');
+  win.document.close();
+}
+
+// MASTER LIST
+function renderML(){
+  const q=(document.getElementById('mlSearch')||{value:''}).value.toLowerCase();
+  const filtered=masterList.map((p,i)=>({p,i})).filter(({p})=>(p.name+' '+vl(p)+' '+p.category).toLowerCase().includes(q));
+  document.getElementById('mlBody').innerHTML=filtered.map(({p,i})=>`<tr>
+    <td style="font-size:12px;color:var(--muted);">${p.category}</td>
+    <td style="font-weight:600;">${p.name}</td>
+    <td style="font-size:12px;color:var(--muted);">${vl(p)||'—'}</td>
+    <td><input type="text" value="${p.colors||''}" oninput="masterList[${i}].colors=this.value" style="min-width:150px;padding:5px 8px;font-size:12px;"></td>
+    <td><input type="number" value="${p.unitPrice}" oninput="masterList[${i}].unitPrice=parseFloat(this.value)||0" style="width:85px;padding:5px 8px;font-size:12px;"></td>
+    <td><input type="number" value="${p.srp}" oninput="masterList[${i}].srp=parseFloat(this.value)||0" style="width:85px;padding:5px 8px;font-size:12px;"></td>
+    <td><button class="toggle-obs ${p.obsolete?'':'avail'}" onclick="toggleObs(${i})">${p.obsolete?'Obsolete':'Available'}</button></td>
+  </tr>`).join('');
+  renderBundleList();
+  renderFreebieList();
+}
+function toggleObs(i){masterList[i].obsolete=!masterList[i].obsolete;renderML();}
+
+// ── NEW ITEM MODAL ──
+function openNewItemModal(){
+  document.getElementById('ni-name').value='';document.getElementById('ni-ram').value='';
+  document.getElementById('ni-storage').value='';document.getElementById('ni-unitprice').value='';
+  document.getElementById('ni-srp').value='';document.getElementById('ni-colors').value='';
+  const m=document.getElementById('newItemModal');m.style.display='flex';
+}
+function closeNewItemModal(){document.getElementById('newItemModal').style.display='none';}
+function saveNewItem(){
+  const cat=document.getElementById('ni-cat').value,name=document.getElementById('ni-name').value.trim();
+  if(!name){toast('Product name required','error');return;}
+  const newP={category:cat,name,ram:document.getElementById('ni-ram').value.trim(),storage:document.getElementById('ni-storage').value.trim(),unitPrice:parseFloat(document.getElementById('ni-unitprice').value)||0,srp:parseFloat(document.getElementById('ni-srp').value)||0,colors:document.getElementById('ni-colors').value.trim()||(COLORS[cat]||[]).join(', '),obsolete:false};
+  masterList.push(newP);
+  if(!inventory[ik(newP)])inventory[ik(newP)]={stock:0,reorder:1};
+  closeNewItemModal();renderML();toast('Product added — remember to Save Changes','success');
+}
+
+// ── FREEBIE FUNCTIONS ──
+function openFreebieModal(){
+  const mainSel=document.getElementById('fr-main'),addonSel=document.getElementById('fr-addon');
+  const phones=masterList.filter(p=>!p.obsolete&&['Smart Phone','Tablet','Bar Phone'].includes(p.category));
+  const accessories=masterList.filter(p=>!p.obsolete&&['Earbuds','Smart Watch','Power Bank','Others'].includes(p.category));
+  mainSel.innerHTML='<option value="">— Select product —</option>'+phones.map(p=>'<option value="'+ik(p)+'">'+p.name+(vl(p)?' ('+vl(p)+')':'')+'</option>').join('');
+  addonSel.innerHTML='<option value="">— Select freebie —</option>'+accessories.map(p=>'<option value="'+ik(p)+'">'+p.name+'</option>').join('');
+  document.getElementById('freebieModal').style.display='flex';
+}
+function saveFreebie(){
+  const mainKey=document.getElementById('fr-main').value;
+  const addonKey=document.getElementById('fr-addon').value;
+  if(!mainKey){toast('Select a main product','error');return;}
+  if(!addonKey){toast('Select a freebie item','error');return;}
+  productFreebies[mainKey]=addonKey;
+  localStorage.setItem('kt_freebies',JSON.stringify(productFreebies));
+  document.getElementById('freebieModal').style.display='none';
+  renderFreebieList();toast('Freebie saved!','success');
+}
+function deleteFreebie(mainKey){
+  delete productFreebies[mainKey];
+  localStorage.setItem('kt_freebies',JSON.stringify(productFreebies));
+  renderFreebieList();toast('Freebie removed','success');
+}
+function renderFreebieList(){
+  const el=document.getElementById('freebieList');if(!el)return;
+  const keys=Object.keys(productFreebies);
+  if(!keys.length){el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0;">No freebies defined yet.</div>';return;}
+  el.innerHTML=keys.map(mk=>{
+    const mainP=masterList.find(p=>ik(p)===mk),addonP=masterList.find(p=>ik(p)===productFreebies[mk]);
+    if(!mainP||!addonP)return '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;margin-bottom:8px;">'+
+      '<div><div style="font-size:13px;font-weight:600;color:var(--accent);">'+mainP.name+(vl(mainP)?' ('+vl(mainP)+')':'')+'</div>'+
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px;">🎁 '+addonP.name+'</div></div>'+
+      '<span data-fk="'+encodeURIComponent(mk)+'" onclick="deleteFreebie(decodeURIComponent(this.dataset.fk))" style="cursor:pointer;color:var(--muted);font-size:16px;">✕</span></div>';
+  }).join('');
+}
+
+// ── BUNDLE MODAL ──
+function openNewBundleModal(){
+  document.getElementById('nb-name').value='';document.getElementById('nb-price').value='';
+  const mainSel=document.getElementById('nb-main'),addonSel=document.getElementById('nb-addon');
+  const phones=masterList.filter(p=>!p.obsolete&&['Smart Phone','Tablet','Bar Phone'].includes(p.category));
+  const accessories=masterList.filter(p=>!p.obsolete&&['Earbuds','Smart Watch','Power Bank','Others'].includes(p.category));
+  mainSel.innerHTML='<option value="">— Select main item —</option>'+phones.map(p=>'<option value="'+ik(p)+'">'+p.name+(vl(p)?' ('+vl(p)+')':'')+'</option>').join('');
+  addonSel.innerHTML='<option value="">— Select accessory —</option>'+accessories.map(p=>'<option value="'+ik(p)+'">'+p.name+'</option>').join('');
+  document.getElementById('newBundleModal').style.display='flex';
+}
+function closeNewBundleModal(){document.getElementById('newBundleModal').style.display='none';}
+function saveNewBundle(){
+  const name=document.getElementById('nb-name').value.trim();
+  const price=parseFloat(document.getElementById('nb-price').value)||0;
+  const mainKey=document.getElementById('nb-main').value;
+  const addonKey=document.getElementById('nb-addon').value;
+  if(!name){toast('Bundle name required','error');return;}
+  if(!mainKey){toast('Select a main item','error');return;}
+  if(!addonKey){toast('Select an accessory','error');return;}
+  if(!price){toast('Bundle price required','error');return;}
+  const mainP=masterList.find(p=>ik(p)===mainKey);
+  const addonP=masterList.find(p=>ik(p)===addonKey);
+  const bundle={id:'BND-'+Date.now().toString().slice(-5),name,price,mainKey,mainName:mainP.name+(vl(mainP)?' ('+vl(mainP)+')':''),addonKey,addonName:addonP.name};
+  predefinedBundles.push(bundle);
+  localStorage.setItem('kt_bundles',JSON.stringify(predefinedBundles));
+  closeNewBundleModal();renderBundleList();renderProducts();
+  toast('Promotion saved!','success');
+}
+function deleteBundle(id){
+  predefinedBundles=predefinedBundles.filter(b=>b.id!==id);
+  localStorage.setItem('kt_bundles',JSON.stringify(predefinedBundles));
+  renderBundleList();renderProducts();toast('Promotion deleted','success');
+}
+function renderBundleList(){
+  const el=document.getElementById('bundleList');if(!el)return;
+  if(!predefinedBundles.length){el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0;">No promotions defined yet.</div>';return;}
+  el.innerHTML=predefinedBundles.map(b=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;margin-bottom:8px;">
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--accent);">${b.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${b.mainName} + ${b.addonName}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:15px;font-weight:700;color:var(--accent);font-family:monospace;">₱${b.price.toLocaleString()}</div>
+        <span onclick="deleteBundle('${b.id}')" style="cursor:pointer;color:var(--muted);font-size:16px;" title="Delete">✕</span>
+      </div>
+    </div>`).join('');
+}
+function saveMasterList(){
+  localStorage.setItem('kt_ml',JSON.stringify(masterList));
+  PRODUCTS=masterList.filter(p=>!p.obsolete);
+  // Ensure inventory entry exists for any new items
+  masterList.forEach(p=>{if(!inventory[ik(p)])inventory[ik(p)]={stock:0,reorder:1};});
+  saveInv();
+  buildCatFilter();renderProducts();
+  if(scriptUrl)pushMLtoSheet();
+  toast('Master list saved!','success');
+}
+async function pushMLtoSheet(){
+  try{
+    const rows=masterList.map(p=>[p.category,p.name,p.ram||'',p.storage||'',p.colors||'',p.unitPrice,p.srp,(inventory[ik(p)]||{}).stock||0,1,p.obsolete?'Obsolete':'Active']);
+    await fetch(scriptUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'pushMasterList',rows})});
+  }catch(e){console.warn('ML sheet sync error',e.message);}
+}
+
+// SETUP
+async function syncPricingFromSheet(){
+  if(!scriptUrl){toast('Connect a sheet first in Setup','error');return;}
+  const statusEl=document.getElementById('syncStatus');
+  if(statusEl)statusEl.textContent='Syncing...';
+  try{
+    const res=await fetch(scriptUrl+'?action=getMasterList');
+    const data=await res.json();
+    if(data.error){toast('Sync error: '+data.error,'error');return;}
+    const rows=data.rows||[];
+    if(!rows.length){toast('No data found in Master List sheet','error');return;}
+    let updated=0;
+    rows.forEach(row=>{
+      // Match by category + name + ram + storage
+      const cat=String(row['category']||row[Object.keys(row)[0]]||'').trim();
+      const name=String(row['model']||row['name']||row[Object.keys(row)[1]]||'').trim();
+      const ram=String(row['ram']||row[Object.keys(row)[2]]||'').trim();
+      const storage=String(row['storage']||row[Object.keys(row)[3]]||'').trim();
+      const colors=String(row['colors']||row[Object.keys(row)[4]]||'').trim();
+      const unitPrice=parseFloat(row['unit price']||row['unitprice']||row[Object.keys(row)[5]]||0);
+      const srp=parseFloat(row['srp']||row[Object.keys(row)[6]]||0);
+      const status=String(row['status']||row[Object.keys(row)[9]]||'Active').toLowerCase();
+      if(!name)return;
+      const idx=masterList.findIndex(p=>
+        p.name.toLowerCase()===name.toLowerCase()&&
+        (p.ram||'').toLowerCase()===(ram||'').toLowerCase()&&
+        (p.storage||'').toLowerCase()===(storage||'').toLowerCase()
+      );
+      if(idx>=0){
+        if(unitPrice>0)masterList[idx].unitPrice=unitPrice;
+        if(srp>0)masterList[idx].srp=srp;
+        if(colors)masterList[idx].colors=colors;
+        masterList[idx].obsolete=status.includes('obsolete');
+        updated++;
+      }
+    });
+    localStorage.setItem('kt_ml',JSON.stringify(masterList));
+    PRODUCTS=masterList.filter(p=>!p.obsolete);
+    buildCatFilter();renderProducts();
+    if(statusEl)statusEl.textContent='✅ '+updated+' products updated from sheet';
+    toast('✅ Pricing synced — '+updated+' products updated','success');
+  }catch(e){
+    if(statusEl)statusEl.textContent='⚠️ Sync failed (CORS? Check sheet URL)';
+    toast('Sync failed: '+e.message,'error');
+    console.error(e);
+  }
+}
+
+// addItemFromReview — go to picker to add more items, review stays accessible via float btn
+function addItemFromReview(){
+  showS('picker');
+  // Float button already shows when pendingItems.length > 0
+  // renderProducts will refresh float button state
+  renderProducts();
+}
+
+async function connectSheet(){
+  const url=document.getElementById('scriptUrl').value.trim();if(!url){toast('Enter URL','error');return;}
+  scriptUrl=url;localStorage.setItem('kt_url',url);
+  document.getElementById('connectStatus').textContent='Connecting...';
+  try{await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'init'})});document.getElementById('connectStatus').textContent='✅ Connected and sheets initialized!';toast('Connected!','success');}
+  catch(e){document.getElementById('connectStatus').textContent='✅ URL saved. (CORS in preview is normal — deployed app will work fine.)';toast('URL saved','success');}
+}
+async function pushInventory(){
+  if(!scriptUrl){toast('Connect a sheet first','error');return;}
+  document.getElementById('pushStatus').textContent='Pushing...';
+  const rows=masterList.map(p=>[p.category,p.name,p.ram,p.storage,p.colors||'',p.unitPrice,p.srp,(inventory[ik(p)]||{}).stock||4,1]);
+  try{await fetch(scriptUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'pushInventory',rows})});document.getElementById('pushStatus').textContent='✅ Done!';toast('Master list pushed!','success');}
+  catch(e){document.getElementById('pushStatus').textContent='✅ Sent (check your sheet)';toast('Pushed','success');}
+}
+function copyScript(){navigator.clipboard.writeText(document.getElementById('scriptText').innerText);toast('Script copied!','success');}
+
+// SETTINGS
+function renderSettings(){
+  document.getElementById('set-target').value=settings.dailyTarget;
+  document.getElementById('set-lowstock').value=settings.lowStockThreshold;
+  document.getElementById('set-reorder').value=settings.globalReorder;
+  const body=document.getElementById('reorderBody');
+  body.innerHTML=masterList.map((p,i)=>{
+    const key=ik(p),inv=inventory[key]||{stock:4,reorder:settings.globalReorder};
+    return '<tr><td style="font-weight:600;">'+p.name+'</td><td style="color:var(--muted);font-size:12px;">'+(vl(p)||'—')+'</td><td class="mono">'+inv.stock+'</td><td><input type="number" value="'+(inv.reorder||settings.globalReorder)+'" min="0" data-key="'+encodeURIComponent(key)+'" oninput="updateReorder(decodeURIComponent(this.dataset.key),this.value)" style="width:70px;padding:5px 8px;font-size:12px;border:1.5px solid var(--border);border-radius:6px;"></td></tr>';
+  }).join('');
+}
+function updateReorder(key,val){if(inventory[key])inventory[key].reorder=parseInt(val)||1;}
+function applyGlobalReorder(){
+  const g=parseInt(document.getElementById('set-reorder').value)||1;
+  masterList.forEach(p=>{if(inventory[ik(p)])inventory[ik(p)].reorder=g;});
+  saveInv();renderSettings();toast('Global reorder point applied to all items','success');
+}
+function saveSettings(){
+  settings.dailyTarget=parseInt(document.getElementById('set-target').value)||3000;
+  settings.lowStockThreshold=parseInt(document.getElementById('set-lowstock').value)||2;
+  settings.globalReorder=parseInt(document.getElementById('set-reorder').value)||1;
+  localStorage.setItem('kt_settings',JSON.stringify(settings));
+  saveInv();
+  toast('Settings saved!','success');
+}
+
+// CUSTOMER INFO
+function toggleCustomerInfo(){
+  const el=document.getElementById('custInfoFields');
+  const btn=document.getElementById('custInfoToggle');
+  if(!el)return;
+  const show=el.style.display==='none';
+  el.style.display=show?'block':'none';
+  btn.textContent=show?'− Hide':'+ Add';
+}
+function getCustomerInfo(){
+  const n=(document.getElementById('cust-name')||{value:''}).value.trim();
+  const c=(document.getElementById('cust-contact')||{value:''}).value.trim();
+  const e=(document.getElementById('cust-email')||{value:''}).value.trim();
+  return (n||c||e)?{name:n,contact:c,email:e}:null;
+}
+function resetCustomerInfo(){
+  ['cust-name','cust-contact','cust-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const f=document.getElementById('custInfoFields');if(f)f.style.display='none';
+  const b=document.getElementById('custInfoToggle');if(b)b.textContent='+ Add';
+}
+
+// TOAST
+
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+type+' show';clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),3500);}
+
+// BOOT
+init();
+</script>
+</body>
+</html>
