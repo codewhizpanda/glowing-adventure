@@ -457,6 +457,8 @@ function doPost(e) {
     if (d.action === 'pushInventory') return pushInventory(d);
     if (d.action === 'pushMasterList') return pushMasterList(d);
     if (d.action === 'decrementStock') return decrementStock(d);
+    if (d.action === 'verifyPin')     return verifyPin(d);
+    if (d.action === 'setPin')        return setPin(d);
     return respond({error:'Unknown action'});
   } catch(err) { return respond({error:err.toString()}); }
 }
@@ -570,6 +572,35 @@ function decrementStock(d) {
     }
   });
   return respond({status:'ok'});
+}
+
+function pinHash(pin) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(pin), Utilities.Charset.UTF_8);
+  return bytes.map(b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
+}
+
+function getStoredPinHash() {
+  const props = PropertiesService.getScriptProperties();
+  let h = props.getProperty('ADMIN_PIN_HASH');
+  if (!h) {
+    h = pinHash('1234');
+    props.setProperty('ADMIN_PIN_HASH', h);
+  }
+  return h;
+}
+
+function verifyPin(d) {
+  const entered = pinHash(d.pin || '');
+  return respond({ valid: entered === getStoredPinHash() });
+}
+
+function setPin(d) {
+  const currentHash = pinHash(d.current || '');
+  if (currentHash !== getStoredPinHash()) return respond({ error: 'Incorrect current PIN' });
+  const next = String(d.next || '');
+  if (next.length < 4) return respond({ error: 'PIN must be at least 4 digits' });
+  PropertiesService.getScriptProperties().setProperty('ADMIN_PIN_HASH', pinHash(next));
+  return respond({ status: 'ok' });
 }
 
 function respond(data) {
