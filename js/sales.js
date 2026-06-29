@@ -119,7 +119,6 @@ export function renderReview() {
   const firstItem = state.pendingItems[0];
   html += `<div style="text-align:right;">
     <div class="review-chip" style="background:rgba(255,255,255,.2);">${firstItem.payment}</div>
-    <div class="review-chip" style="background:rgba(255,255,255,.2);margin-top:4px;">${firstItem.soldType}${firstItem.promoter ? ' — ' + firstItem.promoter : ''}</div>
   </div>`;
   html += '</div>';
   if (custInfo) {
