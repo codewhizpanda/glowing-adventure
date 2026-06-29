@@ -16,7 +16,7 @@ export function login(user) {
   state.currentUser = user;
   document.getElementById('lockScreen').style.display = 'none';
   document.getElementById('userPill').innerHTML = '<svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.125em;" aria-hidden="true"><use href="#ic-user"/></svg> ' + user + ' — Switch';
-  const adminTabs = ['tab-inventory', 'tab-po', 'tab-ml', 'tab-settings', 'tab-setup'];
+  const adminTabs = ['tab-inventory', 'tab-po', 'tab-ml', 'tab-settings', 'tab-setup', 'tab-reports', 'tab-dashboard'];
   adminTabs.forEach(id => {
     document.getElementById(id).style.display = user === 'Admin' ? '' : 'none';
   });

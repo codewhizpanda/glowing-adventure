@@ -47,6 +47,7 @@
   <symbol id="ic-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
   <symbol id="ic-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></symbol>
   <symbol id="ic-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
 </svg>
 
 <div id="lockScreen">
@@ -90,6 +91,8 @@
   <button class="tab" id="tab-ml" onclick="showPage('masterlist',event)"><svg class="ic" aria-hidden="true"><use href="#ic-list"/></svg> Master List</button>
   <button class="tab" id="tab-settings" onclick="showPage('settings',event)"><svg class="ic" aria-hidden="true"><use href="#ic-settings"/></svg> Settings</button>
   <button class="tab" id="tab-setup" onclick="showPage('setup',event)"><svg class="ic" aria-hidden="true"><use href="#ic-zap"/></svg> Setup</button>
+  <button class="tab" id="tab-reports" onclick="showPage('reports',event)"><svg class="ic" aria-hidden="true"><use href="#ic-calendar"/></svg> Reports</button>
+  <button class="tab" id="tab-dashboard" onclick="showPage('dashboard',event)"><svg class="ic" aria-hidden="true"><use href="#ic-chart"/></svg> Dashboard</button>
 </nav>
 
 <!-- SYNC BANNER -->
@@ -292,7 +295,7 @@
           <div id="s-result" style="font-size:20px;font-weight:700;margin-bottom:8px;"></div>
           <div style="font-size:13px;color:var(--muted);">Daily Target: <strong>₱3,000.00</strong></div>
           <div style="margin-top:14px;display:flex;gap:8px;">
-            <button class="btn btn-primary btn-sm" onclick="submitDayReport()"><svg class="ic" aria-hidden="true"><use href="#ic-upload"/></svg> Submit</button>
+            <button class="btn btn-danger btn-sm" onclick="closeDayReport()"><svg class="ic" aria-hidden="true"><use href="#ic-x-circle"/></svg> Close Day</button>
             <button class="btn btn-outline btn-sm" onclick="printReport()"><svg class="ic" aria-hidden="true"><use href="#ic-printer"/></svg> Print</button>
           </div>
         </div>
@@ -545,7 +548,12 @@ function doPost(e) {
 function doGet(e) {
   if (e.parameter.action === 'ping')       return respond({status:'ok'});
   if (e.parameter.action === 'getAllData') return getAllData();
+  if (e.parameter.action === 'getSales')  return getSalesData();
   return respond({status:'Khonsu Tech OPS v2 running'});
+}
+
+function getSalesData() {
+  return respond({ sales: sheetToObjects('Sales') });
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
@@ -840,6 +848,87 @@ function clearData(sh) {
     </div>
     <div id="restockDraftList"><div style="font-size:13px;color:var(--muted);padding:8px 0;">No items staged yet.</div></div>
     <button id="restockConfirmBtn" class="btn btn-success" onclick="confirmRestock()" disabled style="width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg class="ic" aria-hidden="true"><use href="#ic-check"/></svg> Confirm Receipt</button>
+  </div>
+</div>
+
+<!-- REPORTS PAGE -->
+<div class="page" id="page-reports">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
+    <div>
+      <h2 style="margin-bottom:2px;">Reports</h2>
+      <p class="subtitle" style="margin:0;">Review sales by period — pulled from Google Sheets.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-outline btn-sm" id="rp-btn-today" onclick="loadReportPeriod('today')">Today</button>
+      <button class="btn btn-outline btn-sm" id="rp-btn-week" onclick="loadReportPeriod('week')">This Week</button>
+      <button class="btn btn-outline btn-sm" id="rp-btn-month" onclick="loadReportPeriod('month')">This Month</button>
+    </div>
+  </div>
+  <div class="g3" style="margin:16px 0;" id="rp-stats">
+    <div class="sc"><div class="sc-label">Total Sales</div><div class="sc-val" id="rp-total">—</div></div>
+    <div class="sc"><div class="sc-label">Net Revenue</div><div class="sc-val" id="rp-net">—</div></div>
+    <div class="sc"><div class="sc-label">Transactions</div><div class="sc-val" id="rp-count">—</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr style="background:var(--accent);color:#fff;">
+        <th style="padding:10px 12px;text-align:left;">Date</th>
+        <th style="padding:10px 12px;text-align:left;">SO#</th>
+        <th style="padding:10px 12px;text-align:left;">Item</th>
+        <th style="padding:10px 12px;text-align:left;">Variant</th>
+        <th style="padding:10px 12px;text-align:left;">Color</th>
+        <th style="padding:10px 12px;text-align:right;">Qty</th>
+        <th style="padding:10px 12px;text-align:right;">Sold Price</th>
+        <th style="padding:10px 12px;text-align:right;">Net Sales</th>
+        <th style="padding:10px 12px;text-align:left;">Payment</th>
+        <th style="padding:10px 12px;text-align:left;">Staff</th>
+      </tr></thead>
+      <tbody id="rp-body"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:28px;">Select a period above to load data.</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div class="page" id="page-dashboard">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div>
+      <h2 style="margin-bottom:2px;">Dashboard</h2>
+      <p class="subtitle" style="margin:0;">Live overview — data from Google Sheets.</p>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="initDashboard()"><svg class="ic" aria-hidden="true"><use href="#ic-upload"/></svg> Refresh</button>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="g3" style="margin:16px 0;">
+    <div class="sc"><div class="sc-label">Today Net Sales</div><div class="sc-val" id="db-today">—</div></div>
+    <div class="sc"><div class="sc-label">This Week</div><div class="sc-val" id="db-week">—</div></div>
+    <div class="sc"><div class="sc-label">This Month</div><div class="sc-val" id="db-month">—</div></div>
+  </div>
+  <div class="g2" style="margin-bottom:16px;">
+    <div class="sc"><div class="sc-label">Units Sold Today</div><div class="sc-val" id="db-units">—</div></div>
+    <div class="sc"><div class="sc-label">Target vs Actual</div><div class="sc-val" id="db-target-badge" style="font-size:13px;">—</div></div>
+  </div>
+
+  <!-- 7-day bar chart -->
+  <div class="card">
+    <h3><svg class="ic" aria-hidden="true"><use href="#ic-chart"/></svg> Last 7 Days Revenue</h3>
+    <div id="db-bar-chart" style="display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:8px;"></div>
+    <div id="db-bar-labels" style="display:flex;gap:6px;margin-top:6px;"></div>
+  </div>
+
+  <!-- Payment & Staff split -->
+  <div class="g2" style="margin-top:16px;">
+    <div class="card">
+      <h3>Payment Breakdown</h3>
+      <div id="db-donut-wrap" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <svg id="db-donut" width="100" height="100" viewBox="0 0 42 42" style="flex-shrink:0;"></svg>
+        <div id="db-donut-legend" style="font-size:13px;line-height:2;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Staff Performance</h3>
+      <div id="db-staff" style="font-size:13px;"></div>
+    </div>
   </div>
 </div>
 

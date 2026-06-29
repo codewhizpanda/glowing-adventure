@@ -4,7 +4,6 @@ import { toast } from './toast.js';
 import { generatePO } from './purchase-orders.js';
 import { renderInv } from './inventory.js';
 import { showS } from './nav.js';
-import { processQueue, getQueue, showSyncOverlay, hideSyncOverlay } from './sync.js';
 
 export function renderSalesTable() {
   const body = document.getElementById('salesBody');
@@ -105,42 +104,9 @@ export function removeRow(id) {
   renderSummary();
 }
 
-export async function submitDayReport() {
-  if (!state.saleRows.length) { toast('No transactions to submit', 'error'); return; }
-
-  if (state.scriptUrl) {
-    showSyncOverlay('Submitting sales to Sheets…');
-    try {
-      const res = await fetch(state.scriptUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'logSale', date: new Date().toISOString(), rows: state.saleRows }),
-      });
-      const json = await res.json();
-      if (json.error) throw new Error(json.error);
-      const q = getQueue();
-      if (q.length) {
-        for (const item of q) {
-          try {
-            const r = await fetch(state.scriptUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'text/plain' },
-              body: JSON.stringify({ action: item.action, ...item.payload }),
-            });
-            await r.json();
-          } catch { /* leave in queue */ }
-        }
-      }
-    } catch (e) {
-      hideSyncOverlay();
-      toast('Submit failed: ' + e.message, 'error');
-      return;
-    }
-    hideSyncOverlay();
-  } else {
-    toast('No sheet connected — data saved locally', 'success');
-  }
-
+export function closeDayReport() {
+  if (!state.saleRows.length) { toast('No transactions today', 'error'); return; }
+  if (!confirm('Close today\'s report? Local data will be cleared. All confirmed sales are already saved to Sheets.')) return;
   const low = [];
   state.PRODUCTS.forEach(p => {
     const k = ik(p);
@@ -209,5 +175,5 @@ export function printReport() {
 }
 
 window.removeRow = removeRow;
-window.submitDayReport = submitDayReport;
+window.closeDayReport = closeDayReport;
 window.printReport = printReport;

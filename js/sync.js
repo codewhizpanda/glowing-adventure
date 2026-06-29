@@ -48,7 +48,8 @@ export async function tryPush(action, payload) {
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action, ...payload }),
     });
-    await res.json();
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
   } catch {
     enqueue(action, payload);
   }

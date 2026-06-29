@@ -9,6 +9,8 @@ import { renderSalesTable, renderSummary } from './report.js';
 import { buildCatFilter, renderProducts } from './products.js';
 import { getQueue, updateBanner } from './sync.js';
 import { initUnits, initRestockPage } from './units.js';
+import { initDashboard } from './dashboard.js';
+import { initReportsPage } from './reports.js';
 
 // Side-effect imports to register window.* handlers not reachable via above imports
 import './auth.js';
@@ -68,6 +70,8 @@ function init() {
     if (name === 'masterlist') renderML();
     if (name === 'settings') renderSettings();
     if (name === 'restock') initRestockPage();
+    if (name === 'dashboard') initDashboard();
+    if (name === 'reports') initReportsPage();
   });
 
   document.addEventListener('screen:change', e => {
