@@ -181,6 +181,44 @@ export async function pullFromSheets() {
       localStorage.setItem('kt_pos', JSON.stringify(state.purchaseOrders));
     }
 
+    // Restore today's sale rows from Sheets
+    try {
+      const todayLocale = new Date().toLocaleDateString('en-PH');
+      const salesRes = await fetch(state.scriptUrl + '?action=getSales');
+      const salesData = await salesRes.json();
+      if (!salesData.error && salesData.sales) {
+        const todaySales = salesData.sales.filter(r => r.Date === todayLocale);
+        if (todaySales.length) {
+          state.saleRows = todaySales.map(r => ({
+            id: Number(r.SaleID) || Date.now() + Math.random(),
+            so: String(r.SO || ''),
+            bundle: String(r.BundleCode || ''),
+            itemName: String(r.ItemName || ''),
+            variant: String(r.Variant || ''),
+            color: String(r.Color || ''),
+            qty: Number(r.Qty) || 1,
+            unitPrice: Number(r.UnitPrice) || 0,
+            srp: Number(r.SRP) || 0,
+            soldPrice: Number(r.SoldPrice) || 0,
+            pasaPrice: Number(r.PasaPrice) || 0,
+            discount: Number(r.Discount) || 0,
+            netSales: Number(r.NetSales) || 0,
+            payment: String(r.Payment || 'Cash'),
+            soldType: String(r.SoldType || 'Walk-in'),
+            promoter: String(r.Promoter || ''),
+            staff: String(r.Staff || ''),
+            isAddon: r.IsAddon === 'true' || r.IsAddon === true,
+            isPromotion: r.IsPromotion === 'true' || r.IsPromotion === true,
+            productKey: '',
+            customer: (r.CustomerName || r.CustomerContact)
+              ? { name: String(r.CustomerName || ''), contact: String(r.CustomerContact || ''), email: String(r.CustomerEmail || '') }
+              : null,
+            imeis: r.IMEI ? String(r.IMEI).split(',').map(s => s.trim()).filter(Boolean) : [],
+          }));
+        }
+      }
+    } catch { /* non-critical — saleRows stays empty */ }
+
     toast('Data synced from Google Sheets', 'success');
   } catch (e) {
     console.warn('Pull from Sheets failed:', e.message);
