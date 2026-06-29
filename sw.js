@@ -1,4 +1,4 @@
-const CACHE = 'khonsu-ops-v6';
+const CACHE = 'khonsu-ops-v7';
 const ASSETS = [
   './',
   './index.html',

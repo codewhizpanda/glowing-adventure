@@ -40,15 +40,20 @@ async function _push(action, body, label, statusEl) {
   return json;
 }
 
+let _overlayShownAt = 0;
 function _showOverlay(msg) {
   const el = document.getElementById('syncOverlay');
-  if (!el) return;
+  if (!el) { console.warn('syncOverlay not found'); return; }
   document.getElementById('syncOverlayMsg').textContent = msg || 'Syncing data…';
   el.style.display = 'flex';
+  _overlayShownAt = Date.now();
 }
 function _hideOverlay() {
   const el = document.getElementById('syncOverlay');
-  if (el) el.style.display = 'none';
+  if (!el) return;
+  const elapsed = Date.now() - _overlayShownAt;
+  const delay = Math.max(0, 600 - elapsed);
+  setTimeout(() => { el.style.display = 'none'; }, delay);
 }
 
 export async function pushInventory() {
