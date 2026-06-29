@@ -1,19 +1,8 @@
 import { state } from './state.js';
-import { fmt } from './utils.js';
+import { fmt, sameDay, parseSheetDate } from './utils.js';
 import { showSyncOverlay, hideSyncOverlay } from './sync.js';
 import { toast } from './toast.js';
 
-function todayStr() {
-  return new Date().toLocaleDateString('en-PH');
-}
-
-function dayStr(d) {
-  return d.toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric' });
-}
-
-function isoDateStr(d) {
-  return d.toLocaleDateString('en-PH');
-}
 
 async function fetchSales() {
   if (!state.scriptUrl) return null;
@@ -65,10 +54,10 @@ function renderDashboard(rows) {
   rows.forEach(r => {
     const net = Number(r.NetSales) || 0;
     const qty = Number(r.Qty) || 0;
-    const d = new Date(r.Date);
-    d.setHours(0, 0, 0, 0);
+    const d = parseSheetDate(r.Date);
+    if (!d) return;
 
-    if (r.Date === todayLocale) { todayNet += net; todayUnits += qty; }
+    if (sameDay(r.Date)) { todayNet += net; todayUnits += qty; }
     if (d >= weekStart) weekNet += net;
     if (d >= monthStart) monthNet += net;
 
@@ -102,12 +91,14 @@ function renderBarChart(rows, today) {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    days.push({ date: d, label: d.toLocaleDateString('en-PH', { weekday: 'short' }), locale: d.toLocaleDateString('en-PH'), net: 0 });
+    days.push({ date: d, label: d.toLocaleDateString('en-PH', { weekday: 'short' }), net: 0 });
   }
 
   rows.forEach(r => {
     const net = Number(r.NetSales) || 0;
-    const day = days.find(d => d.locale === r.Date);
+    const rd = parseSheetDate(r.Date);
+    if (!rd) return;
+    const day = days.find(d => sameDay(r.Date, d.date));
     if (day) day.net += net;
   });
 
@@ -118,7 +109,7 @@ function renderBarChart(rows, today) {
 
   barWrap.innerHTML = days.map(d => {
     const pct = Math.max((d.net / max) * 100, d.net > 0 ? 4 : 0);
-    const isToday = d.locale === today.toLocaleDateString('en-PH');
+    const isToday = sameDay(d.date.toISOString(), today);
     return `<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;">
       <span style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;">${d.net > 0 ? '₱' + Math.round(d.net / 1000) + 'k' : ''}</span>
       <div style="width:100%;border-radius:6px 6px 0 0;height:${pct}%;min-height:${d.net > 0 ? 4 : 0}px;background:${isToday ? 'var(--accent)' : 'var(--accent-light)'};transition:height .3s;"></div>
@@ -126,7 +117,7 @@ function renderBarChart(rows, today) {
   }).join('');
 
   labelWrap.innerHTML = days.map(d => {
-    const isToday = d.locale === today.toLocaleDateString('en-PH');
+    const isToday = sameDay(d.date.toISOString(), today);
     return `<div style="flex:1;text-align:center;font-size:10px;color:${isToday ? 'var(--accent)' : 'var(--muted)'};font-weight:${isToday ? '700' : '400'};">${d.label}</div>`;
   }).join('');
 }

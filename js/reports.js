@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { fmt } from './utils.js';
+import { fmt, sameDay, fmtSheetDate, parseSheetDate } from './utils.js';
 import { showSyncOverlay, hideSyncOverlay } from './sync.js';
 import { toast } from './toast.js';
 
@@ -59,13 +59,12 @@ export async function loadReportPeriod(period) {
     }));
   }
 
-  const todayLocale = new Date().toLocaleDateString('en-PH');
   const cutoff = period === 'today' ? null : startOf(period === 'week' ? 'week' : 'month');
 
   const filtered = rows.filter(r => {
-    if (period === 'today') return r.Date === todayLocale;
-    const d = new Date(r.Date); d.setHours(0, 0, 0, 0);
-    return d >= cutoff;
+    if (period === 'today') return sameDay(r.Date);
+    const d = parseSheetDate(r.Date);
+    return d && d >= cutoff;
   });
 
   if (!filtered.length) {
@@ -80,7 +79,7 @@ export async function loadReportPeriod(period) {
     const net = Number(r.NetSales) || 0;
     totalSold += sold; totalNet += net;
     return `<tr>
-      <td style="padding:8px 12px;font-size:12px;color:var(--muted);">${r.Date || '—'}</td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--muted);">${fmtSheetDate(r.Date)}</td>
       <td style="padding:8px 12px;font-size:11px;font-family:monospace;">${r.SO || '—'}</td>
       <td style="padding:8px 12px;font-weight:600;">${r.ItemName || '—'}</td>
       <td style="padding:8px 12px;font-size:12px;color:var(--muted);">${r.Variant || '—'}</td>
