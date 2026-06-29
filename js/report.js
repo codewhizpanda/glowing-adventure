@@ -29,7 +29,7 @@ export function renderSalesTable() {
     return `<tr>
       <td style="font-size:11px;" class="mono">${r.so || '—'}</td>
       <td style="font-size:11px;font-family:monospace;font-weight:600;${codeStyle}">${r.bundle || '—'}</td>
-      <td style="font-weight:600;">${r.itemName}${r.isAddon ? ' <span style="font-size:10px;background:var(--accent-light);color:var(--accent);padding:1px 5px;border-radius:4px;">add-on</span>' : ''}</td>
+      <td style="font-weight:600;">${r.itemName}${r.isAddon ? ' <span style="font-size:10px;background:var(--accent-light);color:var(--accent);padding:1px 5px;border-radius:4px;">add-on</span>' : ''}${r.imeis && r.imeis.length ? '<div style="font-size:10px;font-family:monospace;color:var(--muted);margin-top:2px;">' + r.imeis.join(' · ') + '</div>' : ''}</td>
       <td style="color:var(--muted);font-size:12px;">${r.variant || '—'}</td>
       <td>${r.color || '—'}</td>
       <td class="mono">${r.qty}</td>

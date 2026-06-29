@@ -20,6 +20,10 @@ export const state = {
   scriptUrl: localStorage.getItem('kt_url') || '',
   editingPOId: null,
   syncQueue: [],
+  units: [],
+  selectedIMEIs: [],
+  receiveDraftItems: [],
+  restockProduct: null,
 };
 
 export function saveInv() {

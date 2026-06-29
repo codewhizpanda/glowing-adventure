@@ -45,6 +45,8 @@
   <symbol id="ic-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></symbol>
   <symbol id="ic-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
   <symbol id="ic-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="ic-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></symbol>
+  <symbol id="ic-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
 </svg>
 
 <div id="lockScreen">
@@ -82,6 +84,7 @@
 </header>
 <nav>
   <button class="tab active" onclick="showPage('sales',event)"><svg class="ic" aria-hidden="true"><use href="#ic-cart"/></svg> Log Sale</button>
+  <button class="tab" id="tab-restock" onclick="showPage('restock',event)"><svg class="ic" aria-hidden="true"><use href="#ic-truck"/></svg> Receive Stock</button>
   <button class="tab" id="tab-inventory" onclick="showPage('inventory',event)"><svg class="ic" aria-hidden="true"><use href="#ic-box"/></svg> Inventory</button>
   <button class="tab" id="tab-po" onclick="showPage('po',event)"><svg class="ic" aria-hidden="true"><use href="#ic-clipboard"/></svg> Purchase Orders</button>
   <button class="tab" id="tab-ml" onclick="showPage('masterlist',event)"><svg class="ic" aria-hidden="true"><use href="#ic-list"/></svg> Master List</button>
@@ -178,13 +181,31 @@
       </div>
       <div class="g2">
         <div class="field"><label>Variant / RAM / Storage</label><input type="text" id="f-vro" readonly></div>
-        <div class="field">
+        <div class="field" id="colorFieldsWrapper">
           <label>Color(s)</label>
           <div id="colorFields"></div>
           <datalist id="colorOptions"></datalist>
         </div>
       </div>
-      <div class="g2" style="margin-top:12px;">
+      <!-- IMEI picker (Smart Phone, Bar Phone, Tablet only) -->
+      <div id="imeiSection" style="display:none;margin-top:12px;">
+        <div class="field">
+          <label style="display:flex;align-items:center;justify-content:space-between;"><span>IMEI / Barcode</span><span id="imeiAvailCount" style="font-size:11px;color:var(--muted);font-weight:400;"></span></label>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input id="imeiInput" type="text" inputmode="numeric" placeholder="Scan or type IMEI..."
+              style="flex:1;font-family:'JetBrains Mono',monospace;font-size:13px;"
+              oninput="filterIMEIList(this.value)"
+              onkeydown="if(event.key==='Enter'){selectIMEIFromInput();event.preventDefault();}">
+            <button class="btn btn-outline" type="button" onclick="startScan('imeiInput')" title="Scan barcode" style="padding:10px 14px;flex-shrink:0;">
+              <svg class="ic" aria-hidden="true"><use href="#ic-scan"/></svg>
+            </button>
+          </div>
+          <div id="imeiDropdown" style="display:none;max-height:180px;overflow-y:auto;border:1.5px solid var(--accent);border-radius:8px;background:var(--surface);margin-bottom:10px;"></div>
+          <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Selected Units</div>
+          <div id="selectedIMEIList"><div style="font-size:12px;color:var(--muted);">No units selected yet.</div></div>
+        </div>
+      </div>
+      <div id="qtyColorRow" class="g2" style="margin-top:12px;">
         <div class="field"><label>Quantity</label><input type="number" id="f-qty" value="1" min="1" oninput="renderColorFields(parseInt(this.value)||1);recalc()"></div>
         <div class="field" id="pasaField" style="display:none;"><label>Pasa Price (₱)</label><input type="number" id="f-pasa" placeholder="0" oninput="recalc()"></div>
       </div>
@@ -512,6 +533,8 @@ function doPost(e) {
     if (d.action === 'savePromotions')       return savePromotions(d);
     if (d.action === 'saveFreebies')         return saveFreebies(d);
     if (d.action === 'saveSettings')         return saveSettings(d);
+    if (d.action === 'saveUnits')            return saveUnits(d);
+    if (d.action === 'updateUnitStatus')     return updateUnitStatus(d);
     if (d.action === 'verifyPin')            return verifyPin(d);
     if (d.action === 'setPin')               return setPin(d);
     return respond({error:'Unknown action'});
@@ -534,7 +557,8 @@ function initSheets() {
     'PO_Items':        ['POID','ItemName','Qty','Color'],
     'Promotions':      ['BundleID','Name','Price','MainProductKey','MainProductName','AddonProductKey','AddonProductName'],
     'Freebies':        ['MainProductKey','FreebieProductKey','MainProductName','FreebieName'],
-    'Settings':        ['Key','Value']
+    'Settings':        ['Key','Value'],
+    'IMEI_Units':      ['IMEI','ProductKey','ProductName','Color','Status','DRNumber','ReceivedDate','SONumber','SoldDate','IsDummy']
   };
   Object.entries(tabs).forEach(([name, headers]) => {
     let sh = SS.getSheetByName(name);
@@ -691,6 +715,28 @@ function saveSettings(d) {
   return respond({status:'Settings saved'});
 }
 
+// ─── IMEI UNITS ──────────────────────────────────────────────────────────────
+function saveUnits(d) {
+  const sh = getOrCreateSheet('IMEI_Units', ['IMEI','ProductKey','ProductName','Color','Status','DRNumber','ReceivedDate','SONumber','SoldDate','IsDummy']);
+  (d.units||[]).forEach(u => sh.appendRow([u.imei, u.productKey, u.productName, u.color, u.status||'available', u.drNumber||'', u.receivedDate||'', u.soNumber||'', u.soldDate||'', u.isDummy?'Yes':'No']));
+  return respond({status:'Units saved', count:(d.units||[]).length});
+}
+
+function updateUnitStatus(d) {
+  const sh = SS.getSheetByName('IMEI_Units');
+  if (!sh) return respond({error:'No IMEI_Units sheet — run Init first'});
+  const data = sh.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(d.imei)) {
+      sh.getRange(i+1,5).setValue('sold');
+      sh.getRange(i+1,8).setValue(d.soNumber||'');
+      sh.getRange(i+1,9).setValue(d.soldDate||new Date().toLocaleDateString('en-PH'));
+      return respond({status:'ok'});
+    }
+  }
+  return respond({error:'IMEI not found'});
+}
+
 // ─── ADMIN PIN ───────────────────────────────────────────────────────────────
 function pinHash(pin) {
   const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(pin), Utilities.Charset.UTF_8);
@@ -734,6 +780,69 @@ function clearData(sh) {
     <div id="connectStatus" style="font-size:13px;color:var(--muted);"></div>
   </div>
   <div class="card"><div class="stepb">4</div><h3>Push All Data to Sheets</h3><p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Pushes all local data (products, inventory, promotions, freebies, settings) to Google Sheets. Use this for the initial setup or to force a full overwrite.</p><button class="btn btn-success" onclick="pushInventory()"><svg class="ic" aria-hidden="true"><use href="#ic-upload"/></svg> Push All Data</button><span id="pushStatus" style="margin-left:12px;font-size:13px;color:var(--muted);"></span></div>
+</div>
+
+<!-- RECEIVE STOCK PAGE -->
+<div class="page" id="page-restock">
+  <h2>Receive Stock</h2>
+  <p class="subtitle">Record incoming delivery against a supplier DR.</p>
+  <div class="card">
+    <h3><svg class="ic" aria-hidden="true"><use href="#ic-truck"/></svg> Delivery Reference</h3>
+    <div class="g2" style="margin-bottom:12px;">
+      <div class="field"><label>DR Number</label><input type="text" id="rs-dr" placeholder="e.g. DR-2026-06-03596"></div>
+      <div class="field"><label>Date</label><input type="date" id="rs-date"></div>
+    </div>
+    <div class="field"><label>Supplier</label><input type="text" id="rs-supplier" value="Tecnix Trading"></div>
+  </div>
+  <div class="card">
+    <h3><svg class="ic" aria-hidden="true"><use href="#ic-plus"/></svg> Add Item</h3>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Product</label>
+      <input type="text" id="rs-product-input" list="rs-product-list" placeholder="Type to search product..." oninput="updateRestockProductSelection()" autocomplete="off">
+      <datalist id="rs-product-list"></datalist>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Color</label>
+      <select id="rs-color"><option value="">— Select product first —</option></select>
+    </div>
+    <div id="rs-imei-sec" style="display:none;">
+      <div class="field" style="margin-bottom:8px;">
+        <label>IMEI <span style="font-weight:400;color:var(--muted);">(one per unit)</span></label>
+        <div style="display:flex;gap:8px;">
+          <input id="rs-imei" type="text" inputmode="numeric" placeholder="Scan or type IMEI..."
+            style="flex:1;font-family:'JetBrains Mono',monospace;font-size:13px;"
+            onkeydown="if(event.key==='Enter'){addRestockUnit();event.preventDefault();}">
+          <button class="btn btn-outline" type="button" onclick="startScan('rs-imei')" title="Scan barcode" style="padding:10px 14px;flex-shrink:0;">
+            <svg class="ic" aria-hidden="true"><use href="#ic-scan"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="addRestockUnit()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;"><svg class="ic" aria-hidden="true"><use href="#ic-plus"/></svg> Add Unit</button>
+    </div>
+    <div id="rs-qty-sec" style="display:none;">
+      <div class="field" style="margin-bottom:8px;"><label>Quantity</label><input id="rs-qty" type="number" value="1" min="1" style="max-width:120px;"></div>
+      <button class="btn btn-outline" onclick="addRestockQty()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;"><svg class="ic" aria-hidden="true"><use href="#ic-plus"/></svg> Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <h3 style="margin:0;"><svg class="ic" aria-hidden="true"><use href="#ic-clipboard"/></svg> Staged Items</h3>
+      <span id="restockDraftCount" style="font-size:13px;color:var(--muted);font-weight:500;"></span>
+    </div>
+    <div id="restockDraftList"><div style="font-size:13px;color:var(--muted);padding:8px 0;">No items staged yet.</div></div>
+    <button id="restockConfirmBtn" class="btn btn-success" onclick="confirmRestock()" disabled style="width:100%;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg class="ic" aria-hidden="true"><use href="#ic-check"/></svg> Confirm Receipt</button>
+  </div>
+</div>
+
+<!-- SCANNER MODAL -->
+<div id="scannerModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.88);flex-direction:column;align-items:center;justify-content:center;">
+  <div style="position:relative;width:min(360px,88vw);">
+    <video id="scannerVideo" style="width:100%;border-radius:14px;display:block;" playsinline autoplay muted></video>
+    <div style="position:absolute;inset:0;border-radius:14px;border:2px solid rgba(255,255,255,.3);pointer-events:none;"></div>
+    <div style="position:absolute;left:10%;right:10%;top:50%;height:2px;transform:translateY(-50%);background:var(--accent);box-shadow:0 0 10px var(--accent);"></div>
+  </div>
+  <button onclick="closeScanner()" style="margin-top:24px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;padding:12px 32px;border-radius:10px;font-size:15px;cursor:pointer;">Cancel</button>
+  <div style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px;">Point camera at barcode</div>
 </div>
 
 <div class="toast" id="toast"></div>

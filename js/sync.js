@@ -1,6 +1,5 @@
 import { state, saveInv } from './state.js';
 import { toast } from './toast.js';
-import { buildCatFilter, renderProducts } from './products.js';
 
 const QUEUE_KEY = 'kt_queue';
 
@@ -107,8 +106,8 @@ export async function pullFromSheets() {
       state.PRODUCTS = state.masterList.filter(p => !p.obsolete);
       localStorage.setItem('kt_ml', JSON.stringify(state.masterList));
       window.masterList = state.masterList;
-      buildCatFilter();
-      renderProducts();
+      if (window.buildCatFilter) window.buildCatFilter();
+      if (window.renderProducts) window.renderProducts();
     }
 
     if (data.inventory && data.inventory.length) {

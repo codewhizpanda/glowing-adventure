@@ -8,16 +8,29 @@ import { openDetail } from './products.js';
 import { renderSalesTable, renderSummary } from './report.js';
 import { getCustomerInfo, resetCustomerInfo } from './customer.js';
 import { tryPush } from './sync.js';
+import { isImeiProduct, markUnitSold } from './units.js';
 
 export function buildPendingItem() {
   if (!state.selectedProduct) return null;
-  const colors = getColors();
+  const p = state.selectedProduct;
+  const imei = isImeiProduct(p);
+
+  let colors, qty;
+  if (imei) {
+    if (!(state.selectedIMEIs || []).length) { toast('Please scan or select at least one unit', 'error'); return null; }
+    colors = state.selectedIMEIs.map(u => u.color);
+    qty = state.selectedIMEIs.length;
+  } else {
+    if (!allColorsEntered()) { toast('Please enter a color for each unit', 'error'); return null; }
+    colors = getColors();
+    qty = parseInt(document.getElementById('f-qty').value) || 1;
+  }
+
   const color = colors.join(', ');
   const soldType = document.getElementById('f-soldtype').value;
   const promoter = document.getElementById('f-promoter').value.trim();
   const fb = document.getElementById('f-bundle');
   const bundlePrice = parseFloat(fb.dataset.bundlePrice || '0');
-  const qty = parseInt(document.getElementById('f-qty').value) || 1;
   const pasa = parseFloat(document.getElementById('f-pasa').value) || 0;
   const payment = document.getElementById('f-payment').value;
   const bundleCode = fb.value;
@@ -25,11 +38,9 @@ export function buildPendingItem() {
   const promoAddonName = fb.dataset.promoAddonName || '';
   const bundleName = fb.dataset.bundleName || '';
 
-  if (!allColorsEntered()) { toast('Please enter a color for each unit', 'error'); return null; }
   if (soldType === 'Pasa' && !promoter) { toast('Please enter promoter name', 'error'); return null; }
   if (soldType === 'Pasa' && !pasa) { toast('Please enter a Pasa price', 'error'); return null; }
 
-  const p = state.selectedProduct;
   const srp = p.srp;
   const isPromo = bundlePrice > 0;
   const sp = isPromo ? bundlePrice : (soldType === 'Pasa' ? srp + pasa : srp);
@@ -45,6 +56,7 @@ export function buildPendingItem() {
     colors,
     color,
     qty,
+    imeis: imei ? state.selectedIMEIs.map(u => u.imei) : [],
     soldType,
     promoter: soldType === 'Pasa' ? promoter : '',
     pasa: pasa || 0,
@@ -67,6 +79,7 @@ export function addAnotherItem() {
   toast(item.product.name + ' added — select next item', 'success');
   state.selectedProduct = null;
   state.selectedAddon = null;
+  state.selectedIMEIs = [];
   showS('picker');
 }
 
@@ -139,6 +152,9 @@ export function renderReview() {
     html += `<div><div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Qty</div><div style="font-size:13px;font-weight:600;">${item.qty}</div></div>`;
     html += `<div><div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;">Price</div><div style="font-size:13px;font-weight:700;color:var(--accent);font-family:monospace;">${fmt(item.sp)}</div></div>`;
     html += '</div>';
+    if (item.imeis && item.imeis.length) {
+      html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">IMEI: ${item.imeis.join(' · ')}</div>`;
+    }
     if (item.bundleCode) html += `<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${item.isPromo ? 'Promo' : 'Bundle'} Code: <span style="font-family:monospace;font-weight:600;color:var(--accent);">${item.bundleCode}</span></div>`;
     if (item.addon) html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--accent-light);border-radius:8px;margin-bottom:8px;"><svg style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;" aria-hidden="true"><use href="#ic-plus"/></svg><div style="flex:1;font-size:13px;font-weight:600;">${item.addon.product.name}</div><div style="font-size:13px;font-weight:700;color:var(--accent);font-family:monospace;">₱${item.addon.soldPrice.toLocaleString()}</div></div>`;
     if (item.freebie || item.promoAddon) {
@@ -169,6 +185,9 @@ export function editPendingItem(idx) {
   const item = state.pendingItems.splice(idx, 1)[0];
   state.selectedProduct = item.product;
   state.selectedAddon = item.addon;
+  state.selectedIMEIs = item.imeis && item.imeis.length
+    ? item.imeis.map(imei => state.units.find(u => u.imei === imei)).filter(Boolean)
+    : [];
   showS('detail');
   setTimeout(() => {
     openDetail(ik(item.product));
@@ -239,10 +258,14 @@ export function confirmSale() {
       payment: item.payment, soldType: item.soldType,
       promoter: item.promoter, staff: state.currentUser,
       productKey: ik(p), isPromotion: item.isPromo || false,
+      imeis: item.imeis || [],
       customer: item.customer || null,
     };
     state.saleRows.push(row);
-    if (state.inventory[ik(p)]) {
+    if (item.imeis && item.imeis.length) {
+      item.imeis.forEach(imei => markUnitSold(imei, so));
+      decrements.push({ productKey: ik(p), qty: item.qty });
+    } else if (state.inventory[ik(p)]) {
       state.inventory[ik(p)].stock = Math.max(0, state.inventory[ik(p)].stock - item.qty);
       decrements.push({ productKey: ik(p), qty: item.qty });
     }
@@ -303,6 +326,7 @@ export function confirmSale() {
   }
 
   state.pendingItems = [];
+  state.selectedIMEIs = [];
   resetCustomerInfo();
   state.currentSO = null;
   document.getElementById('soBanner').style.display = 'none';

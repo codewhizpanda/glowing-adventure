@@ -8,6 +8,7 @@ import { renderSettings } from './settings.js';
 import { renderSalesTable, renderSummary } from './report.js';
 import { buildCatFilter, renderProducts } from './products.js';
 import { getQueue, updateBanner } from './sync.js';
+import { initUnits, initRestockPage } from './units.js';
 
 // Side-effect imports to register window.* handlers not reachable via above imports
 import './auth.js';
@@ -15,6 +16,7 @@ import './customer.js';
 import './sales.js';
 import './setup.js';
 import './sync.js';
+import './scanner.js';
 
 function init() {
   const saved = localStorage.getItem('kt_ml');
@@ -53,6 +55,9 @@ function init() {
   state.syncQueue = getQueue();
   updateBanner();
 
+  // Init IMEI unit records (generates dummies for existing phone/tablet stock)
+  initUnits();
+
   // Keep window.masterList in sync after reassignment (used by inline oninput handlers in renderML)
   window.masterList = state.masterList;
 
@@ -62,6 +67,7 @@ function init() {
     if (name === 'po') renderPOs();
     if (name === 'masterlist') renderML();
     if (name === 'settings') renderSettings();
+    if (name === 'restock') initRestockPage();
   });
 
   document.addEventListener('screen:change', e => {

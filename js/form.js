@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { COLORS } from './data.js';
+import { isImeiProduct } from './units.js';
 
 export function renderColorFields(qty) {
   const cat = state.selectedProduct ? state.selectedProduct.category : '';
@@ -45,7 +46,9 @@ export function onSoldTypeChange() {
 export function recalc() {
   if (!state.selectedProduct) return;
   const srp = state.selectedProduct.srp;
-  const qty = parseInt(document.getElementById('f-qty').value) || 1;
+  const qty = isImeiProduct(state.selectedProduct)
+    ? (state.selectedIMEIs || []).length
+    : (parseInt(document.getElementById('f-qty').value) || 1);
   const isPasa = document.getElementById('f-soldtype').value === 'Pasa';
   const pasa = isPasa ? (parseFloat(document.getElementById('f-pasa').value) || 0) : 0;
   const displayPrice = isPasa ? srp + pasa : srp;

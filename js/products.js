@@ -5,6 +5,7 @@ import { renderColorFields, recalc } from './form.js';
 import { buildAddonCatFilter, renderAddonList } from './addon.js';
 import { showS } from './nav.js';
 import { ADDON_CATS, COLORS } from './data.js';
+import { isImeiProduct, renderIMEIPicker } from './units.js';
 
 export function buildCatFilter() {
   const cats = ['All', ...new Set(state.PRODUCTS.map(p => p.category))];
@@ -136,6 +137,7 @@ export function openDetail(key) {
   if (!p) { toast('Not found', 'error'); return; }
   state.selectedProduct = p;
   state.selectedAddon = null;
+  state.selectedIMEIs = [];
 
   document.getElementById('d-title').textContent = p.name;
   document.getElementById('d-sub').textContent = p.category + (vl(p) ? ' — ' + vl(p) : '');
@@ -182,8 +184,16 @@ export function openDetail(key) {
   const custSec = document.getElementById('custInfoSection');
   if (custSec) custSec.style.display = state.saleRows.length > 0 ? 'none' : 'block';
 
+  const isImei = isImeiProduct(p);
+  document.getElementById('imeiSection').style.display = isImei ? 'block' : 'none';
+  document.getElementById('qtyColorRow').style.display = isImei ? 'none' : 'block';
+  document.getElementById('colorFieldsWrapper').style.display = isImei ? 'none' : 'block';
+  if (isImei) renderIMEIPicker();
+
   recalc();
   showS('detail');
 }
 
 window.filterProducts = filterProducts;
+window.buildCatFilter = buildCatFilter;
+window.renderProducts = renderProducts;
