@@ -112,7 +112,8 @@ export function renderIMEIPicker() {
     const n = available.length;
     countEl.textContent = n + ' unit' + (n !== 1 ? 's' : '') + ' available';
   }
-  _renderIMEIDropdown(available, '');
+  const dd = document.getElementById('imeiDropdown');
+  if (dd) dd.style.display = 'none';
   renderSelectedIMEIs();
 }
 

@@ -184,13 +184,14 @@ export function editPendingItem(idx) {
   const item = state.pendingItems.splice(idx, 1)[0];
   state.selectedProduct = item.product;
   state.selectedAddon = item.addon;
-  state.selectedIMEIs = item.imeis && item.imeis.length
+  const savedIMEIs = item.imeis && item.imeis.length
     ? item.imeis.map(imei => state.units.find(u => u.imei === imei)).filter(Boolean)
     : [];
   showS('detail');
   setTimeout(() => {
-    openDetail(ik(item.product));
+    openDetail(ik(item.product)); // resets selectedIMEIs — we restore below
     setTimeout(() => {
+      state.selectedIMEIs = savedIMEIs;
       document.getElementById('f-soldtype').value = item.soldType;
       document.getElementById('f-payment').value = item.payment;
       document.getElementById('f-qty').value = item.qty;
@@ -208,6 +209,7 @@ export function editPendingItem(idx) {
           document.getElementById('pasaField').style.display = 'block';
         }
         renderAddonList();
+        if (window.renderIMEIPicker) window.renderIMEIPicker();
         recalc();
       }, 80);
     }, 80);
