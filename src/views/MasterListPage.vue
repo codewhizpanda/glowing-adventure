@@ -302,7 +302,9 @@ const freebieEntries = computed(() =>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="font-size:15px;font-weight:700;color:var(--accent);font-family:monospace;">{{ fmt(b.price) }}</div>
-          <span @click="deleteBundle(b.id)" style="cursor:pointer;color:var(--muted);font-size:18px;" title="Delete">✕</span>
+          <span @click="deleteBundle(b.id)" style="cursor:pointer;color:var(--red);display:inline-flex;align-items:center;" title="Delete">
+            <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+          </span>
         </div>
       </div>
     </div>
@@ -326,7 +328,9 @@ const freebieEntries = computed(() =>
             {{ e.addonP.name }}
           </div>
         </div>
-        <span @click="deleteFreebie(e.mk)" style="cursor:pointer;color:var(--muted);font-size:18px;">✕</span>
+        <span @click="deleteFreebie(e.mk)" style="cursor:pointer;color:var(--red);display:inline-flex;align-items:center;">
+          <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+        </span>
       </div>
     </div>
 

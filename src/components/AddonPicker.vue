@@ -105,7 +105,9 @@ function selectAddon(p) {
         @input="addonDisplay = $event.target.value; if(store.selectedAddon) store.selectedAddon.soldPrice = parseFloat($event.target.value) || 0"
         @blur="onAddonPriceBlur"
       />
-      <span @click="emit('remove')" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;">&times;</span>
+      <span @click="emit('remove')" style="cursor:pointer;color:var(--red);display:inline-flex;align-items:center;">
+        <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+      </span>
     </div>
   </div>
 </template>

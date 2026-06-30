@@ -293,7 +293,9 @@ function confirmRestock() {
             </template>
           </div>
         </div>
-        <span @click="removeDraftItem(i)" style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;padding:0 4px;">&times;</span>
+        <span @click="removeDraftItem(i)" style="cursor:pointer;color:var(--red);display:inline-flex;align-items:center;padding:0 4px;">
+          <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+        </span>
       </div>
     </div>
 

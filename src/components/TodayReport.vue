@@ -132,7 +132,9 @@ function handleCloseDay() {
                 <span v-else style="color:var(--accent2);font-weight:600;">Pasa<br><span v-if="r.promoter" style="font-size:10px;color:var(--muted);font-weight:400;">{{ r.promoter }}</span></span>
               </td>
               <td style="padding:9px 12px;">
-                <span @click="removeRow(r.id)" style="cursor:pointer;color:var(--muted);">✕</span>
+                <span @click="removeRow(r.id)" style="cursor:pointer;color:var(--red);display:inline-flex;align-items:center;">
+                  <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+                </span>
               </td>
             </tr>
           </tbody>

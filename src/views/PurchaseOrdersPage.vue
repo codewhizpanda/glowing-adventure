@@ -241,7 +241,9 @@ td{padding:8px;border-bottom:1px solid #eee;font-size:12px;}
               <div style="font-size:13px;font-weight:600;">{{ item.name }}</div>
               <input v-model.number="item.qty" type="number" min="1" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;" />
               <input v-model="item.color" type="text" placeholder="Color/Notes" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;" />
-              <span @click="removeLine(i)" style="cursor:pointer;color:var(--muted);font-size:18px;padding:0 4px;">&times;</span>
+              <span @click="removeLine(i)" style="cursor:pointer;color:var(--red);display:inline-flex;align-items:center;padding:0 4px;">
+                <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+              </span>
             </div>
           </div>
 

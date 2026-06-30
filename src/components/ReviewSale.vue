@@ -65,7 +65,9 @@ const confirmed = ref(false);
           <button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:11px;display:inline-flex;align-items:center;gap:4px;" @click="emit('edit', idx)">
             <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-edit"/></svg>
           </button>
-          <button class="btn btn-sm" style="padding:4px 8px;font-size:13px;color:var(--red);background:transparent;border:1.5px solid var(--border);border-radius:6px;" @click="emit('remove', idx)">✕</button>
+          <button class="btn btn-sm" style="padding:4px 8px;color:var(--red);background:transparent;border:1.5px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;" @click="emit('remove', idx)">
+            <svg style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" aria-hidden="true"><use href="#ic-trash"/></svg>
+          </button>
         </div>
       </div>
 
