@@ -66,7 +66,7 @@ header {
 nav {
   display: flex;
   gap: 4px;
-  padding: 10px 24px;
+  padding: 10px 16px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 4px rgba(27, 46, 107, .06);
@@ -74,8 +74,66 @@ nav {
   top: 52px;
   z-index: 99;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
+
+/* Hamburger button — shown only on mobile/tablet */
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.hamburger:hover { background: var(--surface2); }
+
+/* Slide-in drawer panel */
+.drawer-panel {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 280px;
+  max-width: 85vw;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 4px 0 24px rgba(0,0,0,.18);
+}
+
+/* Drawer nav items */
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  transition: background .15s, color .15s;
+  margin-bottom: 2px;
+}
+.drawer-item:hover { background: var(--surface2); color: var(--accent); }
+.drawer-item.active { background: var(--accent); color: #fff; font-weight: 700; }
+
+/* Drawer slide+fade transition */
+.drawer-enter-active { transition: opacity .22s ease; }
+.drawer-leave-active { transition: opacity .18s ease; }
+.drawer-enter-from, .drawer-leave-to { opacity: 0; }
+.drawer-enter-active .drawer-panel { transition: transform .28s cubic-bezier(.4,0,.2,1); }
+.drawer-leave-active .drawer-panel  { transition: transform .22s cubic-bezier(.4,0,.2,1); }
+.drawer-enter-from .drawer-panel, .drawer-leave-to .drawer-panel { transform: translateX(-100%); }
 
 .ic {
   width: 1em;
@@ -419,6 +477,13 @@ select.form-control { cursor: pointer; }
 .imei-card { border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;background:var(--bg);transition:border-color .15s; }
 .imei-card:hover { border-color:var(--accent2); }
 .imei-card.sel { border-color:var(--accent);background:var(--accent-light); }
+
+/* ≤1023px: hide desktop nav, show hamburger */
+@media (max-width: 1023px) {
+  nav { display: none; }
+  .hamburger { display: flex; }
+  .nav-user-btn { display: none; }
+}
 
 @media (max-width: 768px) {
   .sale-layout { grid-template-columns:1fr; }
